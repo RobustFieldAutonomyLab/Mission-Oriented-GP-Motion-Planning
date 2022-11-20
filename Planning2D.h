@@ -32,8 +32,12 @@ public:
                double vehicle_size = 0.2,
                int check_inter = 5);
     void buildMap(double cell_size, const Point2& origin, int map_size_x, int map_size_y);
+    void pybuildMap(double cell_size, std::pair<double, double> origin, int map_size_x, int map_size_y);
     std::vector<Pose2> optimize(vector<Pose2> poses,
                                 vector<Vector> vels,
+                                double delta_t);
+    std::vector<std::tuple<double, double, double>> pyoptimize(vector<std::tuple<double, double, double>> poses,
+                                vector<std::tuple<double, double, double>> vels,
                                 double delta_t);
 
 

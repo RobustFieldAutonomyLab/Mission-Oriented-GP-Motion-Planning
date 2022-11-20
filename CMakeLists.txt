@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.16)
 project(GPMP_STR)
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_INIT} -std=c++14 -fPIC")
 
 # Find GTSAM components
 find_package(GTSAM REQUIRED) # Uses installed package
@@ -20,8 +21,6 @@ set(GTSAM_LIBRARIES gtsam)
 find_package(Boost 1.55 REQUIRED system serialization filesystem thread date_time timer)
 include_directories(${Boost_INCLUDE_DIR}
                     gpmp2)
-
-find_package(pybind11 REQUIRED)
 
 # Process source subdirs
 #add_subdirectory(gpmp2)
@@ -67,9 +66,18 @@ target_link_libraries(gpmp2
         ${Boost_LIBRARIES}
         gtsam)
 
-
-add_executable(GPMP_STR main.cpp Planning2D.cpp)
-target_link_libraries(GPMP_STR
+add_subdirectory(extern/pybind11)
+pybind11_add_module(GPPlanning main.cpp Planning2D.cpp)
+target_link_libraries(GPPlanning PRIVATE
+        pybind11::module
         gpmp2
         ${Boost_LIBRARIES}
         gtsam)
+#target_compile_definitions(GPPlanning
+#        PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO}
+#        gpmp2
+#        ${Boost_LIBRARIES}
+#        gtsam)
+
+#add_executable(GPMP_STR main.cpp Planning2D.cpp)
+

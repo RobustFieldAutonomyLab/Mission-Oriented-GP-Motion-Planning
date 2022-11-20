@@ -28,6 +28,11 @@ Planning2D::Planning2D(bool use_vehicle_dynamics, double epsilon_dist,
 
     vel_fix = noiseModel::Isotropic::Sigma(3, 0.0001);
 }
+
+void Planning2D::pybuildMap(double cell_size, std::pair<double, double> origin, int map_size_x, int map_size_y){
+    buildMap(cell_size, Point2(origin.first, origin.second), map_size_x, map_size_y);
+}
+
 void Planning2D::buildMap(double cell_size, const Point2& origin, int map_size_x, int map_size_y){
     Matrix data;
     data = Matrix (map_size_x, map_size_y);
@@ -46,6 +51,31 @@ void Planning2D::buildMap(double cell_size, const Point2& origin, int map_size_x
 //      }
     sdf = new PlanarSDF(origin, cell_size, data);
 }
+
+std::vector<std::tuple<double, double, double>> Planning2D::pyoptimize(vector<std::tuple<double, double, double>> poses,
+                              vector<std::tuple<double, double, double>> vels,
+                              double delta_t){
+    vector<Pose2> poses_v;
+    vector<Vector> vels_v;
+    for (auto pose : poses){
+        poses_v.emplace_back(Pose2(std::get<0>(pose),
+                             std::get<1>(pose),
+                            std::get<2>(pose)));
+    }
+    for (auto vel : vels){
+        vels_v.emplace_back(Vector3(std::get<0>(vel),
+                                  std::get<1>(vel),
+                                  std::get<2>(vel)));
+    }
+    auto results = optimize(poses_v, vels_v, delta_t);
+
+    vector<std::tuple<double, double, double>> t_results;
+    for(auto p : results){
+        t_results.emplace_back(make_tuple(p.x(), p.y(), p.theta()));
+    }
+    return t_results;
+}
+
 std::vector<Pose2> Planning2D::optimize(vector<Pose2> poses,
                             vector<Vector> vels,
                             double delta_t){
