@@ -19,8 +19,7 @@ set(GTSAM_LIBRARIES gtsam)
 
 # Boost - same requirement as gtsam
 find_package(Boost 1.55 REQUIRED system serialization filesystem thread date_time timer)
-include_directories(${Boost_INCLUDE_DIR}
-                    gpmp2)
+include_directories(${Boost_INCLUDE_DIR})
 
 # Process source subdirs
 #add_subdirectory(gpmp2)
@@ -39,45 +38,53 @@ include_directories(${Boost_INCLUDE_DIR}
 
 
 
-add_library(gpmp2 gpmp2/dynamics/VehicleDynamicsFactorPose2.h
+add_library(extern_gpmp2 gpmp2/dynamics/VehicleDynamics.h
+        gpmp2/dynamics/VehicleDynamicsFactorPose2.h
         gpmp2/gp/GPutils.cpp
+        gpmp2/gp/GaussianProcessInterpolatorLie.h
+        gpmp2/gp/GaussianProcessPriorLie.h
         gpmp2/gp/GaussianProcessPriorLinear.h
         gpmp2/gp/GaussianProcessInterpolatorLinear.h
+        gpmp2/gp/GaussianProcessInterpolatorPose2.h
         gpmp2/gp/GaussianProcessPriorPose2.h
         gpmp2/kinematics/PointRobotModel.h
         gpmp2/kinematics/PointRobot.cpp
         gpmp2/kinematics/RobotModel.h
 #        gpmp2/kinematics/RobotModel-inl.h
         gpmp2/kinematics/ForwardKinematics.h
+        gpmp2/kinematics/Pose2MobileBaseModel.h
 #        gpmp2/kinematics/ForwardKinematics-inl.h
         gpmp2/kinematics/Pose2MobileBase.cpp
         gpmp2/kinematics/mobileBaseUtils.cpp
         gpmp2/obstacle/ObstaclePlanarSDFFactorGP.h
         gpmp2/obstacle/ObstaclePlanarSDFFactorGPPointRobot.h
         gpmp2/obstacle/PlanarSDF.h
+        gpmp2/obstacle/ObstacleSDFFactor.h
         gpmp2/obstacle/SDFexception.h
 #        gpmp2/obstacle/ObstaclePlanarSDFFactorGP-inl.h
         gpmp2/obstacle/ObstacleCost.h
         gpmp2/obstacle/ObstaclePlanarSDFFactorGPPose2MobileBase.h
         gpmp2/obstacle/ObstaclePlanarSDFFactorPose2MobileBase.h
-        gpmp2/obstacle/SignedDistanceField.cpp)
+        gpmp2/obstacle/SignedDistanceField.cpp
+        gpmp2/obstacle/ObstacleSDFFactor.h
+        gpmp2/obstacle/ObstacleSDFFactorGP.h)
 
-target_link_libraries(gpmp2
+target_link_libraries(extern_gpmp2
         ${Boost_LIBRARIES}
         gtsam)
 
 add_subdirectory(extern/pybind11)
-pybind11_add_module(GPPlanning main.cpp Planning2D.cpp)
+pybind11_add_module(GPPlanning wrapper.cpp Planning2D.cpp)
 target_link_libraries(GPPlanning PRIVATE
         pybind11::module
-        gpmp2
+        extern_gpmp2
         ${Boost_LIBRARIES}
         gtsam)
-#target_compile_definitions(GPPlanning
-#        PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO}
-#        gpmp2
-#        ${Boost_LIBRARIES}
-#        gtsam)
 
-#add_executable(GPMP_STR main.cpp Planning2D.cpp)
+
+add_executable(GPMP_STR main.cpp Planning2D.cpp Planning3D.cpp)
+target_link_libraries(GPMP_STR
+        extern_gpmp2
+        ${Boost_LIBRARIES}
+        gtsam)
 

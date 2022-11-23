@@ -71,12 +71,12 @@ std::vector<std::tuple<double, double, double>> Planning2D::pyoptimize(vector<st
 
     vector<std::tuple<double, double, double>> t_results;
     for(auto p : results){
-        t_results.emplace_back(make_tuple(p.x(), p.y(), p.theta()));
+        t_results.emplace_back(make_tuple(p[0], p[1], p[2]));
     }
     return t_results;
 }
 
-std::vector<Pose2> Planning2D::optimize(vector<Pose2> poses,
+std::vector<Vector> Planning2D::optimize(vector<Pose2> poses,
                             vector<Vector> vels,
                             double delta_t){
     NonlinearFactorGraph graph;
@@ -114,7 +114,7 @@ std::vector<Pose2> Planning2D::optimize(vector<Pose2> poses,
         graph.add(ObstaclePlanarSDFFactorPose2MobileBase(
                 key_pos, *robot, *sdf, _cost_sigma, _epsilon_dist));
 
-        if(_use_vehicle_dynamics == true){
+        if(_use_vehicle_dynamics){
             graph.add(VehicleDynamicsFactorPose2(
                     key_pos, key_vel, _dynamics_sigma));
         }
@@ -135,20 +135,20 @@ std::vector<Pose2> Planning2D::optimize(vector<Pose2> poses,
         }
     }
 
-    graph.print("\nFactor Graph:\n");
-    init_values.print("\nInitial Values:\n");
+//    graph.print("\nFactor Graph:\n");
+//    init_values.print("\nInitial Values:\n");
 
     GaussNewtonParams parameters;
     //parameters.relativeErrorTol = 1e-5;
     //parameters.maxIterations = 100;
     GaussNewtonOptimizer optimizer(graph, init_values, parameters);
     Values result = optimizer.optimize();
-    result.print("Final Result:\n");
+//    result.print("Final Result:\n");
 
-    std::vector<Pose2> out;
+    std::vector<Vector> out;
     for (int i = 0; i <= total_time_step; i++ ){
-        Pose2 pos = result.at<Pose2>(Symbol('x', i));
-        out.push_back(pos);
+        Vector vel = result.at<Vector>(Symbol('v', i));
+        out.push_back(vel);
     }
     return out;
 }

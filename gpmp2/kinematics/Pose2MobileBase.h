@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <gpmp2/kinematics/ForwardKinematics.h>
-#include <gpmp2/config.h>
+#include "../kinematics/ForwardKinematics.h"
+// #include "../config.h"
 
 #include <gtsam/geometry/Pose2.h>
 #include <gtsam/geometry/Pose3.h>
@@ -22,7 +22,8 @@ namespace gpmp2 {
 /**
  * Abstract SE(2) mobile base inherited from ForwardKinematics
  */
-class GPMP2_EXPORT Pose2MobileBase : public ForwardKinematics<gtsam::Pose2, gtsam::Vector> {
+//class GPMP2_EXPORT Pose2MobileBase : public ForwardKinematics<gtsam::Pose2, gtsam::Vector> {
+class Pose2MobileBase : public ForwardKinematics<gtsam::Pose2, gtsam::Vector> {
 
 private:
   // typedefs

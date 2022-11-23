@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <gpmp2/dynamics/VehicleDynamics.h>
+#include "../dynamics/VehicleDynamics.h"
 
 #include <gtsam/nonlinear/NonlinearFactor.h>
 #include <gtsam/base/Matrix.h>

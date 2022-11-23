@@ -5,8 +5,8 @@
  *  @date   Jan 22, 2018
  **/
 
-#include <gpmp2/kinematics/Pose2MobileBase.h>
-#include <gpmp2/kinematics/mobileBaseUtils.h>
+#include "../kinematics/Pose2MobileBase.h"
+#include "../kinematics/mobileBaseUtils.h"
 
 #include <iostream>
 

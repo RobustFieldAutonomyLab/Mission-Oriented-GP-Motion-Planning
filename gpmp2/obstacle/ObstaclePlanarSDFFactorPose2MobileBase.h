@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <gpmp2/kinematics/Pose2MobileBaseModel.h>
-#include <gpmp2/obstacle/ObstaclePlanarSDFFactor.h>
+#include "../kinematics/Pose2MobileBaseModel.h"
+#include "../obstacle/ObstaclePlanarSDFFactor.h"
 
 namespace gpmp2 {
 

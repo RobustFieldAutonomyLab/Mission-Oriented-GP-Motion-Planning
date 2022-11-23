@@ -11,12 +11,12 @@
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/geometry/Pose2.h>
 
-#include "obstacle/ObstaclePlanarSDFFactorPose2MobileBase.h"
-#include "obstacle/ObstaclePlanarSDFFactorGPPose2MobileBase.h"
-#include "dynamics/VehicleDynamicsFactorPose2.h"
-#include "gp/GaussianProcessPriorPose2.h"
-#include "kinematics/Pose2MobileBase.h"
-#include "kinematics/mobileBaseUtils.h"
+#include "gpmp2/obstacle/ObstaclePlanarSDFFactorPose2MobileBase.h"
+#include "gpmp2/obstacle/ObstaclePlanarSDFFactorGPPose2MobileBase.h"
+#include "gpmp2/dynamics/VehicleDynamicsFactorPose2.h"
+#include "gpmp2/gp/GaussianProcessPriorPose2.h"
+#include "gpmp2/kinematics/Pose2MobileBase.h"
+#include "gpmp2/kinematics/mobileBaseUtils.h"
 
 
 using namespace gtsam;
@@ -33,7 +33,7 @@ public:
                int check_inter = 5);
     void buildMap(double cell_size, const Point2& origin, int map_size_x, int map_size_y);
     void pybuildMap(double cell_size, std::pair<double, double> origin, int map_size_x, int map_size_y);
-    std::vector<Pose2> optimize(vector<Pose2> poses,
+    std::vector<Vector> optimize(vector<Pose2> poses,
                                 vector<Vector> vels,
                                 double delta_t);
     std::vector<std::tuple<double, double, double>> pyoptimize(vector<std::tuple<double, double, double>> poses,

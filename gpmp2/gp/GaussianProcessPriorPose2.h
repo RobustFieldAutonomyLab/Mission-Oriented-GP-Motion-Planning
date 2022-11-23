@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <gpmp2/gp/GaussianProcessPriorLie.h>
+#include "../gp/GaussianProcessPriorLie.h"
 
 #include <gtsam/geometry/Pose2.h>
 
