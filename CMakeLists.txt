@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(GPMP_STR)
-
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_INIT} -std=c++14 -fPIC")
 
 # Find GTSAM components
@@ -9,34 +9,16 @@ find_package(GTSAM REQUIRED) # Uses installed package
 include_directories(${GTSAM_INCLUDE_DIR})
 set(GTSAM_LIBRARIES gtsam)
 
-#find_package(GTSAMCMakeTools)
-#include(GtsamMakeConfigFile)
-#include(GtsamBuildTypes)
-#include(GtsamTesting)
-
-# for unittest scripts
-#set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${GTSAM_DIR}/../GTSAMCMakeTools")
-
 # Boost - same requirement as gtsam
 find_package(Boost 1.55 REQUIRED system serialization filesystem thread date_time timer)
 include_directories(${Boost_INCLUDE_DIR})
 
-# Process source subdirs
-#add_subdirectory(gpmp2)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
-
-# Wrapping to MATLAB
-#if(EXAMPLES_BUILD_MATLAB_TOOLBOX)
-#    # wrap
-#    include(GtsamMatlabWrap)
-#    wrap_and_install_library(gtsamexamples.h ${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}" "")
-#endif()
-
-# Install config and export files
-#GtsamMakeConfigFile(gtsamexamples)
-#export(TARGETS ${gtsamexamples_EXPORTED_TARGETS} FILE gtsamexamples-exports.cmake)
-
-
+add_subdirectory(third_party/matplotplusplus)
+include_directories(include)
+include_directories(third_party/matplotplusplus/source)
 
 add_library(extern_gpmp2 gpmp2/dynamics/VehicleDynamics.h
         gpmp2/dynamics/VehicleDynamicsFactorPose2.h
@@ -67,24 +49,53 @@ add_library(extern_gpmp2 gpmp2/dynamics/VehicleDynamics.h
         gpmp2/obstacle/ObstaclePlanarSDFFactorPose2MobileBase.h
         gpmp2/obstacle/SignedDistanceField.cpp
         gpmp2/obstacle/ObstacleSDFFactor.h
-        gpmp2/obstacle/ObstacleSDFFactorGP.h)
+        gpmp2/obstacle/ObstacleSDFFactorGP.h
+        gpmp2/kinematics/Pose3MobileBase.cpp
+        gpmp2/kinematics/Pose3MobileBaseModel.h
+        gpmp2/dynamics/VehicleDynamicsFactorPose3.h)
 
 target_link_libraries(extern_gpmp2
         ${Boost_LIBRARIES}
         gtsam)
 
-add_subdirectory(extern/pybind11)
-pybind11_add_module(GPPlanning wrapper.cpp Planning2D.cpp)
-target_link_libraries(GPPlanning PRIVATE
-        pybind11::module
+# add_subdirectory(extern/pybind11)
+# pybind11_add_module(GPPlanning src/wrapper.cpp
+#         src/Planning2D.cpp
+#         src/Planning3D.cpp)
+# target_link_libraries(GPPlanning PRIVATE
+#         pybind11::module
+#         extern_gpmp2
+#         ${Boost_LIBRARIES}
+#         gtsam)
+
+add_executable(test src/main.cpp
+        src/Planning2D.cpp
+        src/Planning3D.cpp)
+target_link_libraries(test
+        matplot
         extern_gpmp2
         ${Boost_LIBRARIES}
         gtsam)
 
-
-add_executable(GPMP_STR main.cpp Planning2D.cpp Planning3D.cpp)
-target_link_libraries(GPMP_STR
+add_executable(testPoint2D src/PointRobot2DPlanning.cpp)
+target_link_libraries(testPoint2D PUBLIC
+        matplot
+        Threads::Threads
         extern_gpmp2
+#        GPMP2
         ${Boost_LIBRARIES}
         gtsam)
+
+add_executable(testPoint3D
+        src/PointRobot3DPlanning.cpp
+        src/Planning3D.cpp)
+target_link_libraries(testPoint3D PUBLIC
+        matplot
+        Threads::Threads
+        extern_gpmp2
+#        GPMP2
+        ${Boost_LIBRARIES}
+        gtsam)
+
+
 

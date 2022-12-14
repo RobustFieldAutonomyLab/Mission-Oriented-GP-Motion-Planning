@@ -26,6 +26,17 @@ inline double simple2DVehicleDynamicsPose2(const gtsam::Pose2& p, const gtsam::V
   return v(1);
 }
 
+//v: roll, pitch, yaw, x, y, z
+inline double simple2DVehicleDynamicsPose3(const gtsam::Pose3& p, const gtsam::Vector6& v,
+                                           gtsam::OptionalJacobian<1, 6> Hp = boost::none,
+                                           gtsam::OptionalJacobian<1, 6> Hv = boost::none) {
+
+    if (Hp) *Hp = (gtsam::Matrix16() << 0, 0, 0, 0, 0, 0).finished();
+    if (Hv) *Hv = (gtsam::Matrix16() << 1, 0, 0, 0, 0, 0).finished();
+
+    return v(0);
+}
+
 /// simple 2D vehicle dynamics: vehicle heading is consistent with velocity direction
 /// return sliding velocity for vector space, lower is better
 inline double simple2DVehicleDynamicsVector3(const gtsam::Vector3& p, const gtsam::Vector3& v,

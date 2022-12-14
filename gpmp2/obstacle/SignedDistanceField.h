@@ -48,6 +48,7 @@ private:
   // geometry setting of signed distance field
   size_t field_rows_, field_cols_, field_z_;
   double cell_size_;
+  double cell_size_z_;
   // sdf data
   std::vector<gtsam::Matrix> data_;
 
@@ -56,16 +57,17 @@ public:
   SignedDistanceField() {}
 
   /// constructor with all data
-  SignedDistanceField(const gtsam::Point3& origin, double cell_size, const std::vector<gtsam::Matrix>& data) :
+  SignedDistanceField(const gtsam::Point3& origin, double cell_size, double cell_size_z, const std::vector<gtsam::Matrix>& data) :
       origin_(origin), field_rows_(data[0].rows()), field_cols_(data[0].cols()),
-      field_z_(data.size()), cell_size_(cell_size), data_(data) {}
+      field_z_(data.size()), cell_size_(cell_size), cell_size_z_(cell_size_z), data_(data) {}
 
   /// constructor with no data, insert the data later
   /// used by matlab wrapper
-  SignedDistanceField(const gtsam::Point3& origin, double cell_size, size_t field_rows,
+  SignedDistanceField(const gtsam::Point3& origin, double cell_size, double cell_size_z, size_t field_rows,
       size_t field_cols, size_t field_z) :
       origin_(origin), field_rows_(field_rows), field_cols_(field_cols),
-      field_z_(field_z), cell_size_(cell_size), data_(std::vector<gtsam::Matrix>(field_z)) {}
+      field_z_(field_z), cell_size_(cell_size), cell_size_z_(cell_size_z),
+      data_(std::vector<gtsam::Matrix>(field_z)) {}
 
   ~SignedDistanceField() {}
 
@@ -91,11 +93,13 @@ public:
   /// @param point query position
   /// @param g returned gradient reference
   /// @return signed distance
-  inline double getSignedDistance(const gtsam::Point3& point, gtsam::Vector3& g) const {
+  inline double getSignedDistance(const gtsam::Point3& point, gtsam::Vector3& g) const{
     const float_index pidx = convertPoint3toCell(point);
+//    std::cout<<pidx.get<0>()<<" "<<pidx.get<1>()<<" "<<pidx.get<2>()<<std::endl;
     const gtsam::Vector3 g_idx = gradient(pidx);
     // convert gradient of index to gradient of metric unit
-    g = gtsam::Vector3(g_idx(1), g_idx(0), g_idx(2)) / cell_size_;
+    g = gtsam::Vector3(g_idx(1)/cell_size_, g_idx(0)/cell_size_, g_idx(2)/cell_size_z_);
+//      g = gtsam::Vector3(g_idx(1), g_idx(0), g_idx(2))/cell_size_z_;
     return signed_distance(pidx);
   }
 
@@ -105,14 +109,14 @@ public:
     // check point range
     if (point.x() < origin_.x() || point.x() > (origin_.x() + (field_cols_-1.0)*cell_size_) ||
         point.y() < origin_.y() || point.y() > (origin_.y() + (field_rows_-1.0)*cell_size_) ||
-        point.z() < origin_.z() || point.z() > (origin_.z() + (field_z_-1.0)*cell_size_)) {
+        point.z() < origin_.z() || point.z() > (origin_.z() + (field_z_-1.0)*cell_size_z_)) {
         
       throw SDFQueryOutOfRange();
     }
 
     const double col = (point.x() - origin_.x()) / cell_size_;
     const double row = (point.y() - origin_.y()) / cell_size_;
-    const double z   = (point.z() - origin_.z()) / cell_size_;
+    const double z   = (point.z() - origin_.z()) / cell_size_z_;
     return boost::make_tuple(row, col, z);
   }
 
@@ -120,7 +124,7 @@ public:
     return origin_ + gtsam::Point3(
         cell.get<1>() * cell_size_,
         cell.get<0>() * cell_size_,
-        cell.get<2>() * cell_size_);
+        cell.get<2>() * cell_size_z_);
   }
 
 
@@ -177,13 +181,15 @@ public:
   size_t y_count() const { return field_rows_; }
   size_t z_count() const { return field_z_; }
   double cell_size() const { return cell_size_; }
+  double cell_size_z() const { return cell_size_z_; }
   const std::vector<gtsam::Matrix>& raw_data() const { return data_; }
 
   /// print
   void print(const std::string& str = "") const {
     std::cout << str;
     std::cout << "field origin:     "<<origin_.x()<<" "<<origin_.y()<<" "<<origin_.z()<< std::endl;
-    std::cout << "field resolution: " << cell_size_ << std::endl;
+    std::cout << "field resolution x, y: " << cell_size_ << std::endl;
+    std::cout << "field resolution z: " << cell_size_z_ << std::endl;
     std::cout << "field size:       " << field_cols_ << " x "
         << field_rows_ << " x " << field_z_ << std::endl;
   }
@@ -205,6 +211,7 @@ private:
     ar & BOOST_SERIALIZATION_NVP(field_cols_);
     ar & BOOST_SERIALIZATION_NVP(field_z_);
     ar & BOOST_SERIALIZATION_NVP(cell_size_);
+    ar & BOOST_SERIALIZATION_NVP(cell_size_z_);
     ar & BOOST_SERIALIZATION_NVP(data_);
   }
 

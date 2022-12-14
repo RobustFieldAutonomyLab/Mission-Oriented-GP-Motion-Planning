@@ -31,19 +31,31 @@ void PointRobot::forwardKinematics(
   // start calculating Forward and velocity kinematics and Jacobians
   for (size_t i = 0; i < nr_links(); i++) {
     // pose in workspace
-    jpx[i] = Pose3::Create(Rot3(), Point3(jp[0],jp[1],0), H1, H2);
-
+    if (dof() == 2)
+        jpx[i] = Pose3::Create(Rot3(), Point3(jp[0],jp[1],0), H1, H2);
+    else if (dof() == 3)
+        jpx[i] = Pose3::Create(Rot3(), Point3(jp[0],jp[1],jp[2]), H1, H2);
     // velocity in workspace
     if (jv && jvx)
       (*jvx)[i] << (*jv)[0], (*jv)[1], 0;
 
     // Jacobians
     if (J_jpx_jp) {
-      (*J_jpx_jp)[i].col(0) = H2.col(0);
-      (*J_jpx_jp)[i].col(1) = H2.col(1);
+        if (dof() == 2){
+            (*J_jpx_jp)[i].col(0) = H2.col(0);
+            (*J_jpx_jp)[i].col(1) = H2.col(1);
+        }
+        else if (dof() == 3){
+            (*J_jpx_jp)[i].col(0) = H2.col(0);
+            (*J_jpx_jp)[i].col(1) = H2.col(1);
+            (*J_jpx_jp)[i].col(2) = H2.col(2);
+      }
     }
     if (J_jvx_jv) {
-      (*J_jvx_jv)[i].block<2,2>(0, 0) = Matrix::Identity(2,2);
+        if (dof() == 2)
+            (*J_jvx_jv)[i].block<2,2>(0, 0) = Matrix::Identity(2,2);
+        else if (dof() == 3)
+            (*J_jvx_jv)[i].block<3,3>(0, 0) = Matrix::Identity(3,3);
     }
   }
 }
