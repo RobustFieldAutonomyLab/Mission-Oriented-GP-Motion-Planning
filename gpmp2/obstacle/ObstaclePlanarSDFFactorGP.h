@@ -176,6 +176,7 @@ public:
                                   H1, H2, H3, H4);
 
     return err;
+    cout<<"err:"<<err<<endl;
   }
 };
 

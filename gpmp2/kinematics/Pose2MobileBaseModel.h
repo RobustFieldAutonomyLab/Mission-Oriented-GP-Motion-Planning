@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../kinematics/Pose2MobileBase.h"
-#include "../kinematics/RobotModel.h"
+#include "Pose2MobileBase.h"
+#include "RobotModel.h"
 
 namespace gpmp2 {
 

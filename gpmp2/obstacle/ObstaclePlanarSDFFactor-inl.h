@@ -52,7 +52,7 @@ gtsam::Vector ObstaclePlanarSDFFactor<ROBOT>::evaluateError(
       err(sph_idx) = hingeLossObstacleCost(sph_center_2d, sdf_, total_eps);
     }
   }
-  cout<<err<<endl;
+//  cout<<err<<endl;
 
   return err;
 }

@@ -12,8 +12,9 @@ using namespace std;
 
 namespace gpmp2{
 /* ************************************************************************** */
-    void Pose3MobileBase::forwardKinematics(const gtsam::Pose3& p, boost::optional<const gtsam::Vector&> v,
-                           std::vector<gtsam::Pose3>& px, boost::optional<std::vector<gtsam::Vector6>&> vx,
+    void Pose3MobileBase::forwardKinematics(
+            const gtsam::Pose3& p, boost::optional<const gtsam::Vector&> v,
+                           std::vector<gtsam::Pose3>& px, boost::optional<std::vector<gtsam::Vector3>&> vx,
                            boost::optional<std::vector<gtsam::Matrix>&> J_px_p,
                            boost::optional<std::vector<gtsam::Matrix>&> J_vx_p,
                            boost::optional<std::vector<gtsam::Matrix>&> J_vx_v) const{
@@ -28,8 +29,8 @@ namespace gpmp2{
         px.resize(nr_links());
         if (vx) vx->resize(nr_links());
         if (J_px_p) J_px_p->assign(nr_links(), Matrix::Zero(6, dof()));
-        if (J_vx_p) J_vx_p->assign(nr_links(), Matrix::Zero(6, dof()));
-        if (J_vx_v) J_vx_v->assign(nr_links(), Matrix::Zero(6, dof()));
+        if (J_vx_p) J_vx_p->assign(nr_links(), Matrix::Zero(3, dof()));
+        if (J_vx_v) J_vx_v->assign(nr_links(), Matrix::Zero(3, dof()));
 
         // assign values
         Vector6 pv;
@@ -38,18 +39,16 @@ namespace gpmp2{
         const Matrix6 Hveh_base = Pose3::ExpmapDerivative(pv);
         px[0] = p;
         if (J_px_p || J_vx_p || J_vx_v) {
-            if (J_px_p) (*J_px_p)[0].block<6,6>(0,0) = Hveh_base;
+            if (J_px_p) (*J_px_p)[0].block<6, 6>(0, 0) = Hveh_base;
             if (vx) {
                 Vector6 vx_tmp;
                 //TODO: decide the right v
-                vx_tmp << Vector3((*v)[0], (*v)[1], (*v)[2]), Vector3((*v)[3], (*v)[4], (*v)[5]);
-                (*vx)[0] = vx_tmp;
+                (*vx)[0] = Vector3((*v)[3], (*v)[4], (*v)[5]);
                 // (*J_vx_p)[0] is zero
                 if (J_vx_v)
-                    (*J_vx_v)[0].block<6,6>(0,0) = Matrix6::Identity();
+                    (*J_vx_v)[0].block<3, 3>(3, 0) = Matrix3::Identity();
             }
         }
-
 
     }
 }

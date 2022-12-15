@@ -118,7 +118,6 @@ void test_edt3D(){
 
 int main() {
     planning2D();
-//    planning3D();
 //    test_edt3D();
 
     return 0;

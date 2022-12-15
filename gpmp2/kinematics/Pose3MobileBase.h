@@ -4,10 +4,7 @@
 
 #pragma once
 
-#ifndef GPMP_STR_POSE3MOBILEBASE_H
-#define GPMP_STR_POSE3MOBILEBASE_H
-
-#include "../kinematics/ForwardKinematics.h"
+#include "ForwardKinematics.h"
 
 #include <gtsam/geometry/Pose2.h>
 #include <gtsam/geometry/Pose3.h>
@@ -31,7 +28,7 @@ namespace gpmp2{
 
         /**
          *  Forward kinematics: joint configuration to poses in workspace
-         *  Velocity kinematics: optional joint velocities to linear velocities in workspace, no anuglar rate
+         *  Velocity kinematics: optional joint velocities to linear velocities in workspace
          *
          *  @param p position in config space
          *  @param v velocity in config space
@@ -40,7 +37,7 @@ namespace gpmp2{
          *  @param J_px_p et al. optional Jacobians
          **/
         void forwardKinematics(const gtsam::Pose3& p, boost::optional<const gtsam::Vector&> v,
-                               std::vector<gtsam::Pose3>& px, boost::optional<std::vector<gtsam::Vector6>&> vx,
+                               std::vector<gtsam::Pose3>& px, boost::optional<std::vector<gtsam::Vector3>&> vx,
                                boost::optional<std::vector<gtsam::Matrix>&> J_px_p = boost::none,
                                boost::optional<std::vector<gtsam::Matrix>&> J_vx_p = boost::none,
                                boost::optional<std::vector<gtsam::Matrix>&> J_vx_v = boost::none) const;
@@ -48,7 +45,3 @@ namespace gpmp2{
 
 }
 
-
-
-
-#endif //GPMP_STR_POSE3MOBILEBASE_H

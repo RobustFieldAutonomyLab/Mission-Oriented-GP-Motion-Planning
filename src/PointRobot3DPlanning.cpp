@@ -28,7 +28,7 @@ void planning3D(Matrix seafloor_map){
         vs.push_back(avg_vel);
     }
     Planning3D p3d(0.2, 0.2, 1,5);
-    p3d.buildMap(1,10,Point3(0,0,-425), seafloor_map);
+    p3d.buildMap(seafloor_map, Point3(0,0,-425), 1, 10);
     auto result = p3d.optimize(ps, vs, delta_t);
     vector<double> X, Y, Z;
     for (auto pose : result){
@@ -64,7 +64,7 @@ void simplier(Matrix seafloor_map){
         vs.push_back(avg_vel);
     }
     Planning3D p3d(5, 0.2, 0.2,5);
-    p3d.buildMap(1,1,Point3(0,0,-4243), seafloor_map);
+    p3d.buildMap(seafloor_map,Point3(0,0,-4243),1,1);
     auto result = p3d.optimize(ps, vs, delta_t);
     vector<double> X, Y, Z;
     for (auto pose : result){

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libplanning.a  CMakeFiles/planning.dir/src/Planning.cpp.o CMakeFiles/planning.dir/src/Planning2D.cpp.o CMakeFiles/planning.dir/src/Planning3D.cpp.o CMakeFiles/planning.dir/src/Planning3DUUV.cpp.o
+/usr/bin/ranlib libplanning.a

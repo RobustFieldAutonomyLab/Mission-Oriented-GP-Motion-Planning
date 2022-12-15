@@ -26,7 +26,7 @@ inline double simple2DVehicleDynamicsPose2(const gtsam::Pose2& p, const gtsam::V
   return v(1);
 }
 
-//v: roll, pitch, yaw, x, y, z
+//v: 0:roll, 1:pitch, 2:yaw, 3:x, 4:y, 5:z
 inline double simple2DVehicleDynamicsPose3(const gtsam::Pose3& p, const gtsam::Vector6& v,
                                            gtsam::OptionalJacobian<1, 6> Hp = boost::none,
                                            gtsam::OptionalJacobian<1, 6> Hv = boost::none) {
@@ -34,7 +34,8 @@ inline double simple2DVehicleDynamicsPose3(const gtsam::Pose3& p, const gtsam::V
     if (Hp) *Hp = (gtsam::Matrix16() << 0, 0, 0, 0, 0, 0).finished();
     if (Hv) *Hv = (gtsam::Matrix16() << 1, 0, 0, 0, 0, 0).finished();
 
-    return v(0);
+    //TODO: add a scale factor for the angle
+    return sqrt(v(0) * v(0) + v(4) * v(4));
 }
 
 /// simple 2D vehicle dynamics: vehicle heading is consistent with velocity direction

@@ -73,7 +73,7 @@ gtsam::Vector ObstaclePlanarSDFFactorGP<ROBOT, GPINTER>::evaluateError(
   if (use_H)
     GPBase::updatePoseJacobians(Jerr_conf, Jconf_c1, Jconf_v1, Jconf_c2, Jconf_v2,
         H1, H2, H3, H4);
-
+    cout<<"err:"<<err<<endl;
   return err;
 }
 

@@ -19,6 +19,7 @@
 #include "../gpmp2/obstacle/ObstacleSDFFactor.h"
 #include "../gpmp2/obstacle/ObstacleSDFFactorGP.h"
 
+#include "Planning.h"
 #include "SignedDistanceField.h"
 
 
@@ -26,37 +27,18 @@ using namespace gtsam;
 using namespace gpmp2;
 
 
-class Planning3D {
+class Planning3D : public Planning<PointRobotModel, SignedDistanceField>{
 public:
     explicit Planning3D(double epsilon_dist = 2,
                double cost_sigma = 2,
                double vehicle_size = 2,
                int check_inter = 5);
-    void buildMap(double cell_size, double cell_size_z, Point3 origin, Matrix seafloor_map);
+    void buildMap(Matrix seafloor_map, Point3 origin, double cell_size, double cell_size_z);
     std::vector<Vector> optimize(std::vector<Vector> poses,
                                  std::vector<Vector> vels,
                                  double delta_t);
-    std::vector<std::tuple<double, double, double>>
-        pyoptimize(vector<std::tuple<double, double, double>> poses,
-               vector<std::tuple<double, double, double>> vels,
-               double delta_t);
-
 private:
-    int _check_inter;
-
-    double _cost_sigma;
-    double _epsilon_dist;
-
-    SignedDistanceField * sdf;
-    PointRobotModel *robot;
-
-    Matrix3 Qc = 1 * Matrix::Identity(3, 3);
-
-    noiseModel::Gaussian::shared_ptr Qc_model;
-
-    noiseModel::Isotropic::shared_ptr pose_fix;
-
-    noiseModel::Isotropic::shared_ptr vel_fix;
+    typedef Planning<PointRobotModel, SignedDistanceField> Base;
 
 };
 

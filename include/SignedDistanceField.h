@@ -8,6 +8,7 @@
 #define GPMP_STR_SIGNEDDISTANCEFIELD_H
 
 #include "../third_party/edt/edt.hpp"
+#include "../gpmp2/obstacle/SignedDistanceField.h"
 #include <gtsam/base/Matrix.h>
 
 #include "Visualization.h"
@@ -112,6 +113,48 @@ inline vector<Matrix> signedDistanceField3D(vector<Matrix> ground_truth_map, dou
     }
 
     return field_3D;
+}
+
+inline gpmp2::SignedDistanceField* buildSDF(
+        double cell_size, double cell_size_z, Point3 origin, Matrix seafloor_map) {
+    auto s_max = seafloor_map.maxCoeff();
+    auto s_min = seafloor_map.minCoeff();
+    int rows = seafloor_map.rows();
+    int cols = seafloor_map.cols();
+
+    int z_level = int( (s_max - s_min) / cell_size_z ) + 3;
+
+    static gpmp2::SignedDistanceField sdf(
+            origin, cell_size, cell_size_z,
+            rows, cols, z_level);
+
+    vector<Matrix> data_3D;
+
+    for (int z=0; z < z_level; z++){
+        Matrix data;
+        data.setZero(seafloor_map.rows(), seafloor_map.cols());
+        for (int i=0;i<rows;i++){
+            for(int j=0;j<cols;j++){
+                if ( z * cell_size_z + origin.z() < seafloor_map(i,j) ){
+
+                    data(i,j) = 1;
+                }
+//                cout<< z * cell_size_z + origin.z() <<endl;
+            }
+        }
+        data_3D.push_back(data);
+    }
+    vector<Matrix> fields = signedDistanceField3D(data_3D, cell_size);
+    int level = 0;
+    for (auto field : fields){
+//        plotEvidenceMap2D(field, 0, 0, 1);
+//        sleep(1);
+        sdf.initFieldData(level, field);
+        level ++;
+//        print(field);
+    }
+    return &sdf;
+
 }
 
 
