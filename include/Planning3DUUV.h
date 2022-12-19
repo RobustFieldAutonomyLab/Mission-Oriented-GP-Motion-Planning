@@ -27,7 +27,7 @@ public:
     explicit Planning3DUUV(bool use_vehicle_dynamics = true,
                double epsilon_dist = 5,
                double dynamics_sigma = 0.1,
-               double cost_sigma = 0.2,
+               double cost_sigma = 2,
                double vehicle_size = 0.2,
                int check_inter = 5);
     void buildMap(double cell_size, double cell_size_z, Point3 origin, Matrix seafloor_map);

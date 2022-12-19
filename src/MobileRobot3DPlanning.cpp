@@ -5,7 +5,7 @@ using namespace std;
 
 void simplier(Matrix seafloor_map){
     double delta_t = 0.4;
-    int total_time_step = 5;
+    int total_time_step = 100;
     Pose3 start_pose = Pose3(Rot3(),Point3(5, 5, -4220));
     Vector start_vel;
     Vector6 start_vel6;

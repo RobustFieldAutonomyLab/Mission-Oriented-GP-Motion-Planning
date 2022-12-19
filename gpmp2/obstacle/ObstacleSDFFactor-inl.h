@@ -45,6 +45,7 @@ gtsam::Vector ObstacleSDFFactor<ROBOT>::evaluateError(
 
       // chain rules
       H1->row(sph_idx) = Jerr_point * J_px_jp[sph_idx];
+//      cout<<*H1<<endl;
 
     } else {
       err(sph_idx) = hingeLossObstacleCost(sph_centers[sph_idx], sdf_, total_eps);

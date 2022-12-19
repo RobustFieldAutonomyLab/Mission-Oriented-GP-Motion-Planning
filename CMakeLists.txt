@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(GPMP_STR)
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_INIT} -std=c++14 -fPIC")
 
 # Find GTSAM components
@@ -20,40 +20,24 @@ add_subdirectory(third_party/matplotplusplus)
 include_directories(include)
 include_directories(third_party/matplotplusplus/source)
 
-add_library(extern_gpmp2 gpmp2/dynamics/VehicleDynamics.h
-        gpmp2/dynamics/VehicleDynamicsFactorPose2.h
-        gpmp2/gp/GPutils.cpp
-        gpmp2/gp/GaussianProcessInterpolatorLie.h
-        gpmp2/gp/GaussianProcessPriorLie.h
-        gpmp2/gp/GaussianProcessPriorLinear.h
-        gpmp2/gp/GaussianProcessInterpolatorLinear.h
-        gpmp2/gp/GaussianProcessInterpolatorPose2.h
-        gpmp2/gp/GaussianProcessPriorPose2.h
-        gpmp2/kinematics/PointRobotModel.h
-        gpmp2/kinematics/PointRobot.cpp
-        gpmp2/kinematics/RobotModel.h
-#        gpmp2/kinematics/RobotModel-inl.h
-        gpmp2/kinematics/ForwardKinematics.h
-        gpmp2/kinematics/Pose2MobileBaseModel.h
-#        gpmp2/kinematics/ForwardKinematics-inl.h
-        gpmp2/kinematics/Pose2MobileBase.cpp
-        gpmp2/kinematics/mobileBaseUtils.cpp
-        gpmp2/obstacle/ObstaclePlanarSDFFactorGP.h
-        gpmp2/obstacle/ObstaclePlanarSDFFactorGPPointRobot.h
-        gpmp2/obstacle/PlanarSDF.h
-        gpmp2/obstacle/ObstacleSDFFactor.h
-        gpmp2/obstacle/SDFexception.h
-#        gpmp2/obstacle/ObstaclePlanarSDFFactorGP-inl.h
-        gpmp2/obstacle/ObstacleCost.h
-        gpmp2/obstacle/ObstaclePlanarSDFFactorGPPose2MobileBase.h
-        gpmp2/obstacle/ObstaclePlanarSDFFactorPose2MobileBase.h
-        gpmp2/obstacle/SignedDistanceField.cpp
-        gpmp2/obstacle/ObstacleSDFFactor.h
-        gpmp2/obstacle/ObstacleSDFFactorGP.h
-        gpmp2/kinematics/Pose3MobileBase.cpp
-        gpmp2/kinematics/Pose3MobileBaseModel.h
-        gpmp2/dynamics/VehicleDynamicsFactorPose3.h)
+set(gpmp2_subdirs
+        gpmp2/dynamics gpmp2/gp gpmp2/kinematics gpmp2/obstacle)
 
+set(gpmp2_srcs)
+
+# files want to be excluded
+set(excluded_sources "")
+
+# Library sources
+foreach(subdir ${gpmp2_subdirs})
+    file(GLOB subdir_srcs "${subdir}/*.cpp" "${subdir}/*.h")
+    list(REMOVE_ITEM subdir_srcs "${excluded_sources}")
+
+    list(APPEND gpmp2_srcs ${subdir_srcs})
+    message(STATUS "Building Module: ${subdir}")
+endforeach(subdir)
+
+add_library(extern_gpmp2 ${gpmp2_srcs})
 target_link_libraries(extern_gpmp2
         ${Boost_LIBRARIES}
         gtsam)
@@ -68,10 +52,19 @@ target_link_libraries(extern_gpmp2
 #         ${Boost_LIBRARIES}
 #         gtsam)
 
-add_executable(test src/main.cpp
+add_library(planning include/Planning.h
         src/Planning2D.cpp
-        src/Planning3D.cpp)
+        src/Planning3D.cpp
+        src/Planning3DUUV.cpp)
+target_link_libraries(planning
+        matplot
+        extern_gpmp2
+        ${Boost_LIBRARIES}
+        gtsam)
+
+add_executable(test src/main.cpp)
 target_link_libraries(test
+        planning
         matplot
         extern_gpmp2
         ${Boost_LIBRARIES}
@@ -82,20 +75,23 @@ target_link_libraries(testPoint2D PUBLIC
         matplot
         Threads::Threads
         extern_gpmp2
-#        GPMP2
         ${Boost_LIBRARIES}
         gtsam)
 
-add_executable(testPoint3D
-        src/PointRobot3DPlanning.cpp
-        src/Planning3D.cpp)
+add_executable(testPoint3D src/PointRobot3DPlanning.cpp)
 target_link_libraries(testPoint3D PUBLIC
+        planning
         matplot
         Threads::Threads
         extern_gpmp2
-#        GPMP2
         ${Boost_LIBRARIES}
         gtsam)
 
-
-
+add_executable(testMobile3D src/MobileRobot3DPlanning.cpp)
+target_link_libraries(testMobile3D PUBLIC
+        planning
+        matplot
+        Threads::Threads
+        extern_gpmp2
+        ${Boost_LIBRARIES}
+        gtsam)

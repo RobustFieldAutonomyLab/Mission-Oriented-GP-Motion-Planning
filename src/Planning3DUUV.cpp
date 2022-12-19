@@ -74,13 +74,13 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
                     key_pos, *robot, *sdf,
                     _cost_sigma, _epsilon_dist));
 
-//            for(int j = 1; j <= _check_inter+1; j++){
-//                tau = j * (total_time_sec / total_check_step);
-//                graph.add(ObstacleSDFFactorGPPose3MobileBase (
-//                        key_pos1, key_vel1, key_pos2, key_vel2,
-//                        *robot, *sdf, _cost_sigma,
-//                        _epsilon_dist, Qc_model, delta_t, tau));
-//            }
+            for(int j = 1; j <= _check_inter+1; j++){
+                tau = j * (total_time_sec / total_check_step);
+                graph.add(ObstacleSDFFactorGPPose3MobileBase (
+                        key_pos1, key_vel1, key_pos2, key_vel2,
+                        *robot, *sdf, _cost_sigma,
+                        _epsilon_dist, Qc_model, delta_t, tau));
+            }
         }
     }
 
@@ -90,7 +90,7 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
 //    GaussNewtonParams parameters;
     //parameters.relativeErrorTol = 1e-5;
     //parameters.maxIterations = 100;
-    graph.print();
+//    graph.print();
     DoglegOptimizer optimizer(graph, init_values);
     Values result = optimizer.optimize();
     result.print("Final Result:\n");

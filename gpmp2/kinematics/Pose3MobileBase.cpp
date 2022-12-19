@@ -33,13 +33,22 @@ namespace gpmp2{
         if (J_vx_v) J_vx_v->assign(nr_links(), Matrix::Zero(3, dof()));
 
         // assign values
-        Vector6 pv;
-        pv << Vector3(p.rotation().roll(), p.rotation().pitch(), p.rotation().yaw()),
-                    Vector3(p.translation().x(),p.translation().y(),p.translation().z());
-        const Matrix6 Hveh_base = Pose3::ExpmapDerivative(pv);
         px[0] = p;
         if (J_px_p || J_vx_p || J_vx_v) {
-            if (J_px_p) (*J_px_p)[0].block<6, 6>(0, 0) = Hveh_base;
+            if (J_px_p) {
+                const gtsam::Matrix3 Hzrot3 = gtsam::Rot3::ExpmapDerivative(
+                        gtsam::Vector3(p.rotation().roll(), p.rotation().pitch(), p.rotation().yaw()));
+                (*J_px_p)[0].setZero();
+                (*J_px_p)[0].block<3, 3>(0, 0) = Hzrot3;
+                (*J_px_p)[0].block<3, 3>(3, 3) = gtsam::Matrix3::Identity();
+//                Vector6 v6;
+//                v6 << Vector3(p.rotation().roll(), p.rotation().pitch(), p.rotation().yaw()),
+//                                Vector3(p.translation().x(), p.translation().y(), p.translation().z());
+//                const gtsam::Matrix6 Hveh_base = gtsam::Pose3::ExpmapDerivative(v6);
+//                (*J_px_p)[0].block<6, 6>(0, 0) = Hveh_base.transpose();
+//                cout<<"J_px_p: "<<(*J_px_p)[0]<<endl;
+//                cout<<"ExpmapDerivative: "<<Hveh_base<<endl;
+            }
             if (vx) {
                 Vector6 vx_tmp;
                 //TODO: decide the right v
