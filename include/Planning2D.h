@@ -6,7 +6,7 @@
 #define GPMP_STR_PLANNING2D_H
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/inference/Symbol.h>
-#include <gtsam/nonlinear/GaussNewtonOptimizer.h>
+#include <gtsam/nonlinear/DoglegOptimizer.h>
 #include <gtsam/slam/PriorFactor.h>
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/geometry/Pose2.h>
@@ -18,48 +18,31 @@
 #include "../gpmp2/kinematics/Pose2MobileBase.h"
 #include "../gpmp2/kinematics/mobileBaseUtils.h"
 
+#include "Planning.h"
+#include "SignedDistanceField.h"
 
 using namespace gtsam;
 using namespace gpmp2;
 
 
-class Planning2D {
+class Planning2D : public Planning<Pose2MobileBaseModel, PlanarSDF>{
 public:
-    Planning2D(bool use_vehicle_dynamics = true,
+    explicit Planning2D(bool use_vehicle_dynamics = true,
                double epsilon_dist = 2,
                double dynamics_sigma = 0.1,
                double cost_sigma = 0.01,
                double vehicle_size = 0.2,
                int check_inter = 5);
-    void buildMap(double cell_size, const Point2& origin, int map_size_x, int map_size_y);
-    void pybuildMap(double cell_size, std::pair<double, double> origin, int map_size_x, int map_size_y);
-    std::vector<Vector> optimize(vector<Pose2> poses,
+    void buildMap(double cell_size, const Point2& origin, Matrix planarSDF);
+    std::vector<Pose2> optimize(vector<Pose2> poses,
                                 vector<Vector> vels,
                                 double delta_t);
-    std::vector<std::tuple<double, double, double>> pyoptimize(vector<std::tuple<double, double, double>> poses,
-                                vector<std::tuple<double, double, double>> vels,
-                                double delta_t);
-
 
 private:
+    typedef Planning<Pose2MobileBaseModel, PlanarSDF> Base;
+
     bool _use_vehicle_dynamics;
-
-    int _check_inter;
-
-    double _cost_sigma;
-    double _epsilon_dist;
     double _dynamics_sigma;
-
-    PlanarSDF *sdf;
-    Pose2MobileBaseModel *robot;
-
-    Matrix3 Qc = 1 * Matrix::Identity(3, 3);
-
-    noiseModel::Gaussian::shared_ptr Qc_model;
-
-    noiseModel::Isotropic::shared_ptr pose_fix;
-
-    noiseModel::Isotropic::shared_ptr vel_fix;
 
 };
 

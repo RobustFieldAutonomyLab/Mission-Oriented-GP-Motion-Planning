@@ -62,7 +62,7 @@ target_link_libraries(planning
         ${Boost_LIBRARIES}
         gtsam)
 
-add_executable(test src/main.cpp)
+add_executable(test test/main.cpp)
 target_link_libraries(test
         planning
         matplot
@@ -70,15 +70,16 @@ target_link_libraries(test
         ${Boost_LIBRARIES}
         gtsam)
 
-add_executable(testPoint2D src/PointRobot2DPlanning.cpp)
-target_link_libraries(testPoint2D PUBLIC
+add_executable(testMobile2D test/MobileRobot2DPlanning.cpp)
+target_link_libraries(testMobile2D PUBLIC
+        planning
         matplot
         Threads::Threads
         extern_gpmp2
         ${Boost_LIBRARIES}
         gtsam)
 
-add_executable(testPoint3D src/PointRobot3DPlanning.cpp)
+add_executable(testPoint3D test/PointRobot3DPlanning.cpp)
 target_link_libraries(testPoint3D PUBLIC
         planning
         matplot
@@ -87,7 +88,7 @@ target_link_libraries(testPoint3D PUBLIC
         ${Boost_LIBRARIES}
         gtsam)
 
-add_executable(testMobile3D src/MobileRobot3DPlanning.cpp)
+add_executable(testMobile3D test/MobileRobot3DPlanning.cpp)
 target_link_libraries(testMobile3D PUBLIC
         planning
         matplot

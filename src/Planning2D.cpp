@@ -8,9 +8,8 @@ Planning2D::Planning2D(bool use_vehicle_dynamics, double epsilon_dist,
            double dynamics_sigma, double cost_sigma,
            double vehicle_size, int check_inter):
         _use_vehicle_dynamics(use_vehicle_dynamics),
-        _dynamics_sigma(dynamics_sigma), _cost_sigma(cost_sigma),
-        _epsilon_dist(epsilon_dist),
-        _check_inter(check_inter){
+        _dynamics_sigma(dynamics_sigma),
+        Base(3, check_inter, cost_sigma, epsilon_dist){
     double spheres_data[] = {0.0, 0.0, 0.0, 0.0, vehicle_size};
     BodySphereVector sphere_vec;
 
@@ -20,63 +19,15 @@ Planning2D::Planning2D(bool use_vehicle_dynamics, double epsilon_dist,
 
     robot = new Pose2MobileBaseModel(abs_robot, sphere_vec);
 
-    Qc = 1 * Matrix::Identity(3, 3);
-
-    Qc_model = noiseModel::Gaussian::Covariance(Qc);
-
-    pose_fix = noiseModel::Isotropic::Sigma(3, 0.0001);
-
-    vel_fix = noiseModel::Isotropic::Sigma(3, 0.0001);
 }
 
-void Planning2D::pybuildMap(double cell_size, std::pair<double, double> origin, int map_size_x, int map_size_y){
-    buildMap(cell_size, Point2(origin.first, origin.second), map_size_x, map_size_y);
+void Planning2D::buildMap(double cell_size, const Point2& origin, Matrix planarSDF){
+    auto data_field = signedDistanceField2D(planarSDF, cell_size);
+
+    sdf = new PlanarSDF(origin, cell_size, data_field);
 }
 
-void Planning2D::buildMap(double cell_size, const Point2& origin, int map_size_x, int map_size_y){
-    Matrix data;
-    data = Matrix (map_size_x, map_size_y);
-
-    //Construct binary map with static obstacles
-//      std::vector<Point2> current_position{Point2(13,11), Point2(36,38)};
-//      for(int i = 0; i < current_position.size(); i++)
-//      {
-//          for(int j = current_position[i].x() - 3; j < current_position[i].x() + 3; j++)
-//          {
-//              for(int k = current_position[i].y() - 3; k < current_position[i].y() + 3; k++)
-//              {
-//                  data(j, k) = 255;
-//              }
-//          }
-//      }
-    sdf = new PlanarSDF(origin, cell_size, data);
-}
-
-std::vector<std::tuple<double, double, double>> Planning2D::pyoptimize(vector<std::tuple<double, double, double>> poses,
-                              vector<std::tuple<double, double, double>> vels,
-                              double delta_t){
-    vector<Pose2> poses_v;
-    vector<Vector> vels_v;
-    for (auto pose : poses){
-        poses_v.emplace_back(Pose2(std::get<0>(pose),
-                             std::get<1>(pose),
-                            std::get<2>(pose)));
-    }
-    for (auto vel : vels){
-        vels_v.emplace_back(Vector3(std::get<0>(vel),
-                                  std::get<1>(vel),
-                                  std::get<2>(vel)));
-    }
-    auto results = optimize(poses_v, vels_v, delta_t);
-
-    vector<std::tuple<double, double, double>> t_results;
-    for(auto p : results){
-        t_results.emplace_back(make_tuple(p[0], p[1], p[2]));
-    }
-    return t_results;
-}
-
-std::vector<Vector> Planning2D::optimize(vector<Pose2> poses,
+std::vector<Pose2> Planning2D::optimize(vector<Pose2> poses,
                             vector<Vector> vels,
                             double delta_t){
     NonlinearFactorGraph graph;
@@ -138,18 +89,18 @@ std::vector<Vector> Planning2D::optimize(vector<Pose2> poses,
 //    graph.print("\nFactor Graph:\n");
 //    init_values.print("\nInitial Values:\n");
 
-    GaussNewtonParams parameters;
+//    GaussNewtonParams parameters;
     //parameters.relativeErrorTol = 1e-5;
     //parameters.maxIterations = 100;
-    GaussNewtonOptimizer optimizer(graph, init_values, parameters);
+    DoglegOptimizer optimizer(graph, init_values);
     Values result = optimizer.optimize();
 //    result.print("Final Result:\n");
 
-    std::vector<Vector> out;
+    std::vector<Pose2> out;
     for (int i = 0; i <= total_time_step; i++ ){
 //        Vector vel = result.at<Vector>(Symbol('v', i));
         Pose2 vel = result.at<Pose2>(Symbol('x', i));
-        out.push_back(Vector3(vel.x(), vel.y(), vel.theta()));
+        out.push_back(vel);
     }
     return out;
 }

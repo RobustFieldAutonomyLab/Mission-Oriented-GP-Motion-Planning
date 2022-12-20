@@ -56,10 +56,10 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
             graph.add(PriorFactor<Vector>(key_vel, vels[total_time_step], vel_fix));
         }
 
-//        if(_use_vehicle_dynamics){
-//            graph.add(VehicleDynamicsFactorPose3(
-//                    key_pos, key_vel, _dynamics_sigma));
-//        }
+        if(_use_vehicle_dynamics){
+            graph.add(VehicleDynamicsFactorPose3(
+                    key_pos, key_vel, _dynamics_sigma));
+        }
 
         if(i > 0){
             key_pos1 = Symbol('x', i-1);
