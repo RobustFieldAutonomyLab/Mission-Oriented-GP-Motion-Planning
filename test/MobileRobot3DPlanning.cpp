@@ -37,7 +37,7 @@ void simplier(Matrix seafloor_map){
         ps.push_back(pose);
         vs.push_back(avg_vel);
     }
-    Planning3DUUV p3d(true, 5, 2, 0.2,0.2);
+    Planning3DUUV p3d(true, 3, 20, 0.2,0.2);
     p3d.buildMap(1,1,Point3(0,0,-4243),seafloor_map);
     auto result = p3d.optimize(ps, vs, delta_t);
     vector<double> X, Y, Z;

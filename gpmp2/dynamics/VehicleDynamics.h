@@ -32,7 +32,7 @@ inline double simple2DVehicleDynamicsPose3(const gtsam::Pose3& p, const gtsam::V
                                            gtsam::OptionalJacobian<1, 6> Hv = boost::none) {
 
     if (Hp) *Hp = (gtsam::Matrix16() << 0, 0, 0, 0, 0, 0).finished();
-    if (Hv) *Hv = (gtsam::Matrix16() << 1, 0, 0, 0, 0, 0).finished();
+    if (Hv) *Hv = (gtsam::Matrix16() << 1, 0, 0, 0, 1, 0).finished();
 
     //TODO: add a scale factor for the angle
     return sqrt(v(0) * v(0) + v(4) * v(4));
