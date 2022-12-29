@@ -39,7 +39,7 @@ private:
     typedef Planning<Pose3MobileBaseModel, SignedDistanceField> Base;
 
     bool _use_vehicle_dynamics;
-    double _dynamics_sigma;
+    double _dynamics_sigma;//the smaller, the stronger the constraint
 
 };
 

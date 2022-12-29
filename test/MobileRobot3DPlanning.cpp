@@ -35,9 +35,14 @@ void simplier(Matrix seafloor_map){
                               start_pose.y() * (total_time_step-i)/total_time_step + end_pose.y() * i/total_time_step,
                               start_pose.z() * (total_time_step-i)/total_time_step + end_pose.z() * i/total_time_step));
         ps.push_back(pose);
-        vs.push_back(avg_vel);
+        if (i == 0)
+            vs.push_back(start_vel);
+        else if(i == total_time_step)
+            vs.push_back(end_vel);
+        else
+            vs.push_back(avg_vel);
     }
-    Planning3DUUV p3d(true, 3, 20, 0.2,0.2);
+    Planning3DUUV p3d(true, 3, 0.1, 0.2,0.2);
     p3d.buildMap(1,1,Point3(0,0,-4243),seafloor_map);
     auto result = p3d.optimize(ps, vs, delta_t);
     vector<double> X, Y, Z;
