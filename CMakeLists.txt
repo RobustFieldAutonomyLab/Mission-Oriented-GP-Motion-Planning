@@ -21,7 +21,11 @@ include_directories(include)
 include_directories(third_party/matplotplusplus/source)
 
 set(gpmp2_subdirs
-        gpmp2/dynamics gpmp2/gp gpmp2/kinematics gpmp2/obstacle)
+        gpmp2/dynamics
+        gpmp2/gp
+        gpmp2/kinematics
+        gpmp2/obstacle
+        gpmp2/mission)
 
 set(gpmp2_srcs)
 
@@ -63,9 +67,10 @@ target_link_libraries(planning
         gtsam)
 
 add_executable(test test/main.cpp)
-target_link_libraries(test
+target_link_libraries(test PUBLIC
         planning
         matplot
+        Threads::Threads
         extern_gpmp2
         ${Boost_LIBRARIES}
         gtsam)

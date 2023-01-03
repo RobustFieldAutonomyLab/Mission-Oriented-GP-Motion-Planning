@@ -1,13 +1,14 @@
 #include "Planning3DUUV.h"
 
-Planning3DUUV::Planning3DUUV(bool use_vehicle_dynamics, double epsilon_dist,
-                            double dynamics_sigma, double cost_sigma,
-                            double vehicle_size, int check_inter):
-        _use_vehicle_dynamics(use_vehicle_dynamics),
-        _dynamics_sigma(dynamics_sigma),
-        Base(6, check_inter, cost_sigma, epsilon_dist){
+Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
+        _use_vehicle_dynamics(param.use_vehicle_dynamics), _dynamics_sigma(param.dynamics_sigma),
+        _seafloor_mission(param.seafloor_mission), _seafloor_dist(param.seafloor_dist),
+        _seafloor_cost_sigma(param.seafloor_cost_sigma),
+        Base(6, param.check_inter,
+             param.obstacle_cost_sigma,
+             param.obstacle_epsilon_dist){
 
-    double spheres_data[] = {0.0, 0.0, 0.0, 0.0, vehicle_size};
+    double spheres_data[] = {0.0, 0.0, 0.0, 0.0, param.vehicle_size};
     BodySphereVector sphere_vec;
 
     sphere_vec.emplace_back(BodySphere(spheres_data[0], spheres_data[4], Point3(spheres_data[1], spheres_data[2], spheres_data[3])));
@@ -20,6 +21,7 @@ Planning3DUUV::Planning3DUUV(bool use_vehicle_dynamics, double epsilon_dist,
 void Planning3DUUV::buildMap(double cell_size, double cell_size_z,
               Point3 origin, Matrix seafloor_map){
     sdf = buildSDF(cell_size, cell_size_z, origin, seafloor_map);
+    sf = new Seafloor(origin, cell_size, seafloor_map);
 }
 std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
                             vector<Vector> vels,
@@ -73,6 +75,13 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
             graph.add(ObstacleSDFFactorPose3MobileBase (
                     key_pos, *robot, *sdf,
                     _cost_sigma, _epsilon_dist));
+
+            if(_seafloor_mission){
+                graph.add(SeafloorFactorPose3MobileBase(
+                        key_pos, *robot, *sf,
+                        _seafloor_cost_sigma,
+                        _seafloor_dist));
+            }
 
             for(int j = 1; j <= _check_inter+1; j++){
                 tau = j * (total_time_sec / total_check_step);

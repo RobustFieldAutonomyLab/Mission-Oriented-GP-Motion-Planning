@@ -55,7 +55,7 @@ inline Matrix signedDistanceField2D(Matrix ground_truth_map, double cell_size){
     return field * cell_size;
 }
 
-inline vector<Matrix> signedDistanceField3D(vector<Matrix> ground_truth_map, double cell_size){
+inline std::vector<Matrix> signedDistanceField3D(std::vector<Matrix> ground_truth_map, double cell_size){
     Matrix one_map;
 
     int z = ground_truth_map.size();
@@ -77,7 +77,7 @@ inline vector<Matrix> signedDistanceField3D(vector<Matrix> ground_truth_map, dou
         }
     }
 
-    vector<Matrix> field_3D;
+    std::vector<Matrix> field_3D;
 
     if(sum == 0){
         Matrix this_layer;
@@ -128,7 +128,7 @@ inline gpmp2::SignedDistanceField* buildSDF(
             origin, cell_size, cell_size_z,
             rows, cols, z_level);
 
-    vector<Matrix> data_3D;
+    std::vector<Matrix> data_3D;
 
     for (int z=0; z < z_level; z++){
         Matrix data;
@@ -144,7 +144,7 @@ inline gpmp2::SignedDistanceField* buildSDF(
         }
         data_3D.push_back(data);
     }
-    vector<Matrix> fields = signedDistanceField3D(data_3D, cell_size);
+    std::vector<Matrix> fields = signedDistanceField3D(data_3D, cell_size);
     int level = 0;
     for (auto field : fields){
 //        plotEvidenceMap2D(field, 0, 0, 1);

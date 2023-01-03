@@ -1,5 +1,7 @@
 #include <iostream>
 #include "../include/SignedDistanceField.h"
+#include "../gpmp2/mission/Seafloor.h"
+#include "../include/Visualization.h"
 
 using namespace std;
 using namespace gtsam;
@@ -90,8 +92,30 @@ void test_edt3D(){
     
 }
 
+void test_getDistance(){
+    Matrix sf = loadSeaFloorData("../data/depth_grid2.csv");
+    plotEvidenceMap3D(sf, 0, 0, 1, 0);
+    gpmp2::Seafloor sf_model(Point3(0,0,-4243), 1, sf);
+    vector<Point3> target{Point3(40,20,-4200),
+                          Point3(23.4, 32.1, -4194.8),
+                          Point3(21.5, 11.5, -4125.5)};
+    matplot::hold(matplot::on);
+    for (auto t : target){
+        double d = sf_model.getDistance(t);
+        cout<< d <<endl;
+        vector<double> X{t.x(), t.x()};
+        vector<double> Y{t.y(), t.y()};
+        vector<double> Z{t.z(), t.z() - d};
+        auto l = matplot::plot3(X, Y, Z,"-ob")->line_width(2);
+    }
+
+    matplot::show();
+
+
+}
+
 int main() {
-    test_edt3D();
+    test_getDistance();
 
     return 0;
 }

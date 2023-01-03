@@ -42,7 +42,19 @@ void simplier(Matrix seafloor_map){
         else
             vs.push_back(avg_vel);
     }
-    Planning3DUUV p3d(true, 3, 0.1, 0.2,0.2);
+    Planning3DUUVParameter param;
+    param.use_vehicle_dynamics = true;
+    param.dynamics_sigma = 0.1;
+
+    param.obstacle_epsilon_dist = 3;
+    param.obstacle_cost_sigma = 0.2;
+
+    param.vehicle_size = 0.2;
+
+    param.seafloor_mission = false;
+    param.seafloor_cost_sigma = 0.1;
+
+    Planning3DUUV p3d(param);
     p3d.buildMap(1,1,Point3(0,0,-4243),seafloor_map);
     auto result = p3d.optimize(ps, vs, delta_t);
     vector<double> X, Y, Z;

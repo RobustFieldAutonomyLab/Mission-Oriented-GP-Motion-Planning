@@ -15,21 +15,41 @@
 #include "../gpmp2/kinematics/Pose3MobileBaseModel.h"
 #include "../gpmp2/kinematics/mobileBaseUtils.h"
 
+#include "../gpmp2/mission/SeafloorFactorPose3MobileBase.h"
+
 #include "Planning.h"
 #include "SignedDistanceField.h"
+
 
 using namespace gtsam;
 using namespace gpmp2;
 
+struct Planning3DUUVParameter{
+
+    //dynamics
+    bool use_vehicle_dynamics = true;
+    double dynamics_sigma = 0.1;
+
+    //obstacle
+    double obstacle_epsilon_dist = 0.2;
+    double obstacle_cost_sigma = 0.1;
+
+    //RobotModel
+    double vehicle_size = 0.2;
+
+    int check_inter = 5;
+
+    //Seafloor
+    bool seafloor_mission = false;
+    double seafloor_dist = 1;
+    double seafloor_cost_sigma = 2;
+
+};
+
 
 class Planning3DUUV : public Planning<Pose3MobileBaseModel, SignedDistanceField>{
 public:
-    explicit Planning3DUUV(bool use_vehicle_dynamics = true,
-               double epsilon_dist = 5,
-               double dynamics_sigma = 0.1,
-               double cost_sigma = 2,
-               double vehicle_size = 0.2,
-               int check_inter = 5);
+    explicit Planning3DUUV(Planning3DUUVParameter param);
     void buildMap(double cell_size, double cell_size_z, Point3 origin, Matrix seafloor_map);
     std::vector<Pose3> optimize(vector<Pose3> poses,
                                  vector<Vector> vels,
@@ -37,6 +57,11 @@ public:
 
 private:
     typedef Planning<Pose3MobileBaseModel, SignedDistanceField> Base;
+
+    Seafloor *sf;
+    bool _seafloor_mission;
+    double _seafloor_dist;
+    double _seafloor_cost_sigma;
 
     bool _use_vehicle_dynamics;
     double _dynamics_sigma;//the smaller, the stronger the constraint
