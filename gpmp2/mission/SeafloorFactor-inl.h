@@ -39,13 +39,13 @@ gtsam::Vector SeafloorFactor<ROBOT>::evaluateError(
 
             // chain rules
             H1->row(sph_idx) = Jerr_point * J_px_jp[sph_idx];
-//      cout<<*H1<<endl;
+      cout<<*H1<<endl;
 
         } else {
             err(sph_idx) = SeafloorCost(sph_centers[sph_idx], sf_, total_eps);
         }
     }
-//  cout<<"err"<<err<<endl;
+    cout<<"err"<<err<<endl;
 
     return err;
 }

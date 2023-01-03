@@ -19,6 +19,10 @@ namespace gpmp2 {
             return 0.0;
         }
 
+        if (dist < 0.0) {
+            //the robot is below seafloor, not allowed
+            dist = 10;
+        }
         if (dist < eps) {
             // close enough no error
             if (H_point) *H_point = gtsam::Matrix13::Zero();
@@ -26,8 +30,8 @@ namespace gpmp2 {
 
         } else {
             // far away, give far away punishment
-            if (H_point) *H_point = (gtsam::Matrix13() << 0, 0, 1).finished();
-            return -dist;
+            if (H_point) *H_point = (gtsam::Matrix13() << 0, 0, 2*dist).finished();
+            return dist * dist;
         }
     }
 

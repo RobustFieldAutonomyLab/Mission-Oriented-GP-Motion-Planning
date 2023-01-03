@@ -52,7 +52,8 @@ void simplier(Matrix seafloor_map){
     param.vehicle_size = 0.2;
 
     param.seafloor_mission = false;
-    param.seafloor_cost_sigma = 0.1;
+    param.seafloor_cost_sigma = 1;
+    param.seafloor_dist = 10;
 
     Planning3DUUV p3d(param);
     p3d.buildMap(1,1,Point3(0,0,-4243),seafloor_map);
