@@ -98,5 +98,25 @@ inline gtsam::Matrix loadSeaFloorData(std::string file_name){
 
 }
 
+inline void draw(vector<double> X, vector<double> Y, vector<double> Z, Matrix seafloor_map){
+    matplot::cla();
+    plotEvidenceMap2D(seafloor_map, 1, 1, 1);
+    matplot::hold(matplot::on);
+    matplot::plot(X,Y,"-or");
+    matplot::arrow(X[0]+3, Y[0]+3, X[0], Y[0]);
+    matplot::xlabel("x");
+    matplot::ylabel("y");
+    matplot::save("XY.png");
+
+    matplot::cla();
+    matplot::plot(X,Z, "-or");
+    matplot::xlabel("x");
+    matplot::ylabel("z");
+    matplot::hold(matplot::on);
+    matplot::arrow(X[0]+3, Z[0]+3, X[0], Z[0]);
+
+    matplot::save("XZ.png");
+}
+
 
 #endif //GPMP_STR_VISUALIZATION_H

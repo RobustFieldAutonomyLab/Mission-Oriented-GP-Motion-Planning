@@ -122,7 +122,7 @@ inline gpmp2::SignedDistanceField* buildSDF(
     int rows = seafloor_map.rows();
     int cols = seafloor_map.cols();
 
-    int z_level = int( (s_max - s_min) / cell_size_z ) + 3;
+    int z_level = int( (s_max - s_min) / cell_size_z ) + 5;
 
     static gpmp2::SignedDistanceField sdf(
             origin, cell_size, cell_size_z,
@@ -135,8 +135,7 @@ inline gpmp2::SignedDistanceField* buildSDF(
         data.setZero(seafloor_map.rows(), seafloor_map.cols());
         for (int i=0;i<rows;i++){
             for(int j=0;j<cols;j++){
-                if ( z * cell_size_z + origin.z() < seafloor_map(i,j) ){
-
+                if ( z * cell_size_z + origin.z() < seafloor_map(i,j)){
                     data(i,j) = 1;
                 }
 //                cout<< z * cell_size_z + origin.z() <<endl;

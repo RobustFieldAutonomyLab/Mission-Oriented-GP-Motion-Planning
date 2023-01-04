@@ -5,14 +5,14 @@ using namespace std;
 
 void simplier(Matrix seafloor_map){
     double delta_t = 0.4;
-    int total_time_step = 100;
+    int total_time_step = 200;
     Pose3 start_pose = Pose3(Rot3(),Point3(5, 5, -4220));
     Vector start_vel;
     Vector6 start_vel6;
     start_vel6 << Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0);
     start_vel = start_vel6;
 
-    Pose3 end_pose = Pose3(Rot3(), Point3(45, 45, -4185));
+    Pose3 end_pose = Pose3(Rot3(), Point3(45, 45, -4182));
     Vector end_vel;
     Vector6 end_vel6;
     end_vel6 << Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0);
@@ -46,19 +46,21 @@ void simplier(Matrix seafloor_map){
     param.use_vehicle_dynamics = true;
     param.dynamics_sigma = 0.1;
 
-    param.obstacle_epsilon_dist = 3;
+    param.obstacle_epsilon_dist = 1;
     param.obstacle_cost_sigma = 0.2;
 
     param.vehicle_size = 0.2;
 
-    param.seafloor_mission = false;
+    param.seafloor_mission = true;
     param.seafloor_cost_sigma = 1;
-    param.seafloor_dist = 10;
+    param.seafloor_dist = 1;
+
+    param.check_inter = 5;
 
     Planning3DUUV p3d(param);
     p3d.buildMap(1,1,Point3(0,0,-4243),seafloor_map);
     auto result = p3d.optimize(ps, vs, delta_t);
-    vector<double> X, Y, Z;
+    vector<double> X, Y, Z, X_floor, Z_floor;
     for (auto pose : result){
         X.push_back(pose.x());
         Y.push_back(pose.y());
@@ -67,11 +69,16 @@ void simplier(Matrix seafloor_map){
     plotEvidenceMap3D(seafloor_map,0,0,1,0);
     matplot::hold(matplot::on);
     auto l = matplot::plot3(X, Y, Z,"-ob");
+    vector<double> sx, sy, sz;
+    sx.push_back(X[0]);
+    sy.push_back(Y[0]);
+    sz.push_back(Z[0]);
+    auto l2 = matplot::plot3(sx, sy, sz, "r*");
     matplot::show();
+//    draw(X, Y, Z, seafloor_map);
 }
 
 int main(){
-
     Matrix data = loadSeaFloorData("../data/depth_grid2.csv");
     simplier(data);
 }

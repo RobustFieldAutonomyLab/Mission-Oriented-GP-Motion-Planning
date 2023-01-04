@@ -16,6 +16,7 @@
 #include "../gpmp2/kinematics/mobileBaseUtils.h"
 
 #include "../gpmp2/mission/SeafloorFactorPose3MobileBase.h"
+#include "../gpmp2/mission/SeafloorFactorGPPose3MobileBase.h"
 
 #include "Planning.h"
 #include "SignedDistanceField.h"
@@ -40,7 +41,7 @@ struct Planning3DUUVParameter{
     int check_inter = 5;
 
     //Seafloor
-    bool seafloor_mission = false;
+    bool seafloor_mission = true;
     double seafloor_dist = 1;
     double seafloor_cost_sigma = 2;
 
