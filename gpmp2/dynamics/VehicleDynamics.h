@@ -27,7 +27,7 @@ inline double simple2DVehicleDynamicsPose2(const gtsam::Pose2& p, const gtsam::V
 }
 
 //v: 0:roll, 1:pitch, 2:yaw, 3:x, 4:y, 5:z
-inline double simple2DVehicleDynamicsPose3(const gtsam::Pose3& p, const gtsam::Vector6& v,
+inline double simple3DVehicleDynamicsPose3(const gtsam::Pose3& p, const gtsam::Vector6& v,
                                            gtsam::OptionalJacobian<1, 6> Hp = boost::none,
                                            gtsam::OptionalJacobian<1, 6> Hv = boost::none) {
     double err = 100 * v(1) * v(1) + v(4) * v(4);

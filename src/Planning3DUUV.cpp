@@ -3,7 +3,7 @@
 Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
         _use_vehicle_dynamics(param.use_vehicle_dynamics), _dynamics_sigma(param.dynamics_sigma),
         _seafloor_mission(param.seafloor_mission), _seafloor_dist(param.seafloor_dist),
-        _seafloor_cost_sigma(param.seafloor_cost_sigma),
+        _seafloor_cost_sigma(param.seafloor_cost_sigma), _use_current(param.use_current),
         Base(6, param.check_inter,
              param.obstacle_cost_sigma,
              param.obstacle_epsilon_dist){
@@ -17,12 +17,25 @@ Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
 
     robot = new Pose3MobileBaseModel(abs_robot, sphere_vec);
 
+
+
 }
 void Planning3DUUV::buildMap(double cell_size, double cell_size_z,
               Point3 origin, Matrix seafloor_map){
     sdf = buildSDF(cell_size, cell_size_z, origin, seafloor_map);
     sf = new Seafloor(origin, cell_size, seafloor_map);
 }
+
+void Planning3DUUV::buildCurrentGrid(double cell_size, double cell_size_z, Point3 origin,
+                      vector<Matrix> grid_u, vector<Matrix> grid_v){
+    int rows = grid_u[0].rows();
+    int cols = grid_u[0].cols();
+    int z = grid_u.size();
+
+    wcg = new WaterCurrentGrid(origin, cell_size, cell_size_z, rows, cols, z,
+                                       grid_u, grid_v);
+}
+
 std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
                             vector<Vector> vels,
                             double delta_t){
@@ -58,7 +71,10 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
             graph.add(PriorFactor<Vector>(key_vel, vels[total_time_step], vel_fix));
         }
 
-        if(_use_vehicle_dynamics){
+        if (_use_current && _use_vehicle_dynamics){
+            graph.add(VehicleDynamicsFactorWithCurrentPose3(key_pos, key_vel, *wcg, _dynamics_sigma));
+        }
+        else if(_use_vehicle_dynamics){
             graph.add(VehicleDynamicsFactorPose3(
                     key_pos, key_vel, _dynamics_sigma));
         }
@@ -114,8 +130,13 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
 
     std::vector<Pose3> out;
     for (int i = 0; i <= total_time_step; i++ ){
-        Pose3 vel = result.at<Pose3>(Symbol('x', i));
-        out.push_back(vel);
+        Pose3 pose = result.at<Pose3>(Symbol('x', i));
+        Vector vel = result.at<Vector>(Symbol('v', i));
+        if(_use_current){
+            vel = wcg->getVehicleVelocityWithoutCurrent(pose.translation(), vel);
+            cout<< "Velocity " << i <<": "<< vel<<endl;
+        }
+        out.push_back(pose);
     }
     return out;
 

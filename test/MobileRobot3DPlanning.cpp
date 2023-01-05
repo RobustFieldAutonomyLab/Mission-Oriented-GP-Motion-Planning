@@ -3,9 +3,9 @@
 
 using namespace std;
 
-void simplier(Matrix seafloor_map){
+void simplier(Matrix seafloor_map, vector<Matrix> grid_u, vector<Matrix> grid_v){
     double delta_t = 0.4;
-    int total_time_step = 200;
+    int total_time_step = 100;
     Pose3 start_pose = Pose3(Rot3(),Point3(5, 5, -4220));
     Vector start_vel;
     Vector6 start_vel6;
@@ -44,7 +44,7 @@ void simplier(Matrix seafloor_map){
     }
     Planning3DUUVParameter param;
     param.use_vehicle_dynamics = true;
-    param.dynamics_sigma = 0.1;
+    param.dynamics_sigma = 0.01;
 
     param.obstacle_epsilon_dist = 1;
     param.obstacle_cost_sigma = 0.2;
@@ -52,13 +52,17 @@ void simplier(Matrix seafloor_map){
     param.vehicle_size = 0.2;
 
     param.seafloor_mission = true;
-    param.seafloor_cost_sigma = 1;
+    param.seafloor_cost_sigma = 0.2;
     param.seafloor_dist = 1;
 
     param.check_inter = 5;
 
+    param.use_current = true;
+
     Planning3DUUV p3d(param);
     p3d.buildMap(1,1,Point3(0,0,-4243),seafloor_map);
+    if (param.use_current)
+        p3d.buildCurrentGrid(1, 1000, Point3(0,0,-5000), grid_u, grid_v);
     auto result = p3d.optimize(ps, vs, delta_t);
     vector<double> X, Y, Z, X_floor, Z_floor;
     for (auto pose : result){
@@ -80,5 +84,7 @@ void simplier(Matrix seafloor_map){
 
 int main(){
     Matrix data = loadSeaFloorData("../data/depth_grid2.csv");
-    simplier(data);
+    vector<Matrix> current_grid_u = loadCurrentData("../data/u_mean.csv");
+    vector<Matrix> current_grid_v = loadCurrentData("../data/v_mean.csv");
+    simplier(data, current_grid_u, current_grid_v);
 }

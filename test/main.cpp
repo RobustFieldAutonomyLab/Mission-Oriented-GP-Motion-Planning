@@ -2,6 +2,7 @@
 #include "../include/SignedDistanceField.h"
 #include "../gpmp2/mission/Seafloor.h"
 #include "../include/Visualization.h"
+#include "../gpmp2/mission/WaterCurrentGrid.h"
 
 using namespace std;
 using namespace gtsam;
@@ -110,12 +111,42 @@ void test_getDistance(){
     }
 
     matplot::show();
+}
 
+void test_waterCurrentGrid(){
+    vector<Matrix> current_grid_u = loadCurrentData("../data/u_mean.csv");
+    vector<Matrix> current_grid_v = loadCurrentData("../data/v_mean.csv");
+    vector<double> current_depth_grid = loadDepthData("../data/current_depth_map.csv");
+
+    auto wcg = gpmp2::WaterCurrentGrid(Point3(0,0,-5000),
+                                       1, 1000, 50, 60, 2,
+                                       current_grid_u, current_grid_v);
+
+    vector<Point3> target{Point3(40,20,-4200),
+                          Point3(23.4, 32.1, -4194.8),
+                          Point3(21.5, 11.5, -4125.5)};
+
+    vector<Point3> lp{Point3(40,20,0),
+                          Point3(23, 32, 0),
+                          Point3(21, 11, 0)};
+
+    vector<Point3> hp{Point3(41,21,1),
+                      Point3(24, 33, 1),
+                      Point3(22, 12, 1)};
+
+    for (int i = 0; i<target.size(); i++){
+        cout<< "lp u " << current_grid_u[lp[i].z()](lp[i].y(), lp[i].x())<<endl;
+        cout<< "lp v " << current_grid_v[lp[i].z()](lp[i].y(), lp[i].x())<<endl;
+
+        cout<< "hp u " << current_grid_u[hp[i].z()](hp[i].y(), hp[i].x())<<endl;
+        cout<< "hp v " << current_grid_v[hp[i].z()](hp[i].y(), hp[i].x())<<endl;
+        cout<<wcg.getVelocity(target[i])<<endl;
+    }
 
 }
 
 int main() {
-    test_getDistance();
+    test_waterCurrentGrid();
 
     return 0;
 }

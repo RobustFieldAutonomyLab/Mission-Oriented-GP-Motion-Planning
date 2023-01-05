@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../dynamics/VehicleDynamics.h"
+#include "VehicleDynamics.h"
+#include "../mission/WaterCurrent3DVehicleDynamicsPose3.h"
 
 #include <gtsam/nonlinear/NonlinearFactor.h>
 #include <gtsam/base/Matrix.h>
@@ -12,27 +13,30 @@
 
 
 namespace gpmp2 {
-    class VehicleDynamicsFactorPose3: public gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Vector> {
+    class VehicleDynamicsFactorWithCurrentPose3: public gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Vector> {
     private:
         //typedefs
-        typedef VehicleDynamicsFactorPose3 This;
+        typedef VehicleDynamicsFactorWithCurrentPose3 This;
         typedef gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Vector> Base;
+
+        const WaterCurrentGrid& wcg_;
 
     public:
         /// shorthand for a smart pointer to a factor
         typedef boost::shared_ptr<This> shared_ptr;
 
         /* Default constructor do nothing */
-        VehicleDynamicsFactorPose3() {}
+        VehicleDynamicsFactorWithCurrentPose3() : wcg_(WaterCurrentGrid()) {}
 
         /**
          * Constructor
          * @param cost_sigma cost function covariance, should to identity model
          */
-        VehicleDynamicsFactorPose3(gtsam::Key poseKey, gtsam::Key velKey, double cost_sigma) :
-        Base(gtsam::noiseModel::Isotropic::Sigma(1, cost_sigma), poseKey, velKey) {}
+        VehicleDynamicsFactorWithCurrentPose3(gtsam::Key poseKey, gtsam::Key velKey, const WaterCurrentGrid &grid, double cost_sigma) :
+                Base(gtsam::noiseModel::Isotropic::Sigma(1, cost_sigma), poseKey, velKey),
+                wcg_(grid){}
 
-        virtual ~VehicleDynamicsFactorPose3() {}
+        virtual ~VehicleDynamicsFactorWithCurrentPose3() {}
 
 
         /// error function
@@ -45,7 +49,7 @@ namespace gpmp2 {
 
             if (H1 || H2) {
                 Matrix16 Hp, Hv;
-                const double err = simple3DVehicleDynamicsPose3(pose, vel.head<6>(), Hp, Hv);
+                const double err = WaterCurrent3DVehicleDynamicsPose3(pose, vel.head<6>(), wcg_,Hp, Hv);
                 if (H1) {
                     *H1 = Matrix::Zero(1, 6);
                     H1->block<1,6>(0,0) = Hp;
@@ -57,7 +61,7 @@ namespace gpmp2 {
                 return (Vector(1) << err).finished();
 
             } else {
-                return (Vector(1) << simple3DVehicleDynamicsPose3(pose, vel.head<6>())).finished();
+                return (Vector(1) << WaterCurrent3DVehicleDynamicsPose3(pose, vel.head<6>(), wcg_)).finished();
             }
         }
 
@@ -69,7 +73,7 @@ namespace gpmp2 {
 
         /** print contents */
         void print(const std::string& s="", const gtsam::KeyFormatter& keyFormatter = gtsam::DefaultKeyFormatter) const {
-            std::cout << s << "VehicleDynamicsFactorPose3 :" << std::endl;
+            std::cout << s << "VehicleDynamicsFactorWithCurrentPose3 :" << std::endl;
             Base::print("", keyFormatter);
         }
 

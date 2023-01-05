@@ -18,6 +18,9 @@
 #include "../gpmp2/mission/SeafloorFactorPose3MobileBase.h"
 #include "../gpmp2/mission/SeafloorFactorGPPose3MobileBase.h"
 
+#include "../gpmp2/mission/WaterCurrent3DVehicleDynamicsPose3.h"
+#include "../gpmp2/dynamics/VehicleDynamicsFactorWithCurrentPose3.h"
+
 #include "Planning.h"
 #include "SignedDistanceField.h"
 
@@ -45,6 +48,9 @@ struct Planning3DUUVParameter{
     double seafloor_dist = 1;
     double seafloor_cost_sigma = 2;
 
+    //Water current
+    bool use_current = false;
+
 };
 
 
@@ -55,6 +61,8 @@ public:
     std::vector<Pose3> optimize(vector<Pose3> poses,
                                  vector<Vector> vels,
                                  double delta_t);
+    void buildCurrentGrid(double cell_size, double cell_size_z, Point3 origin,
+                          vector<Matrix> grid_u, vector<Matrix> grid_v);
 
 private:
     typedef Planning<Pose3MobileBaseModel, SignedDistanceField> Base;
@@ -66,6 +74,9 @@ private:
 
     bool _use_vehicle_dynamics;
     double _dynamics_sigma;//the smaller, the stronger the constraint
+
+    WaterCurrentGrid *wcg;
+    bool _use_current;
 
 };
 

@@ -98,7 +98,7 @@ inline gtsam::Matrix loadSeaFloorData(std::string file_name){
 
 }
 
-inline void draw(vector<double> X, vector<double> Y, vector<double> Z, Matrix seafloor_map){
+inline void draw(std::vector<double> X, std::vector<double> Y, std::vector<double> Z, gtsam::Matrix seafloor_map){
     matplot::cla();
     plotEvidenceMap2D(seafloor_map, 1, 1, 1);
     matplot::hold(matplot::on);
@@ -116,6 +116,43 @@ inline void draw(vector<double> X, vector<double> Y, vector<double> Z, Matrix se
     matplot::arrow(X[0]+3, Z[0]+3, X[0], Z[0]);
 
     matplot::save("XZ.png");
+}
+
+inline std::vector<gtsam::Matrix> loadCurrentData(std::string file_name){
+    std::fstream depth_file;
+    depth_file.open(file_name, std::ios::in);
+    int x_width, y_width, z_width;
+    depth_file>>x_width;
+    depth_file>>y_width;
+    depth_file>>z_width;
+    std::vector<gtsam::Matrix> data;
+    for (int i = 0; i<z_width; i++){
+        gtsam::Matrix this_layer(x_width, y_width);
+        double tmp;
+        for (int j=0; j<x_width; j++){
+            for (int k=0; k<y_width; k++){
+                depth_file>>tmp;
+                this_layer(j,k) = tmp;
+            }
+        }
+        data.push_back(this_layer);
+    }
+
+    return data;
+}
+
+inline std::vector<double> loadDepthData(std::string file_name){
+    std::fstream depth_file;
+    depth_file.open(file_name, std::ios::in);
+    int x_width, y_width, z_width;
+    depth_file>>x_width;
+    std::vector<double> data;
+    for (int i = 0; i<z_width; i++){
+        double tmp;
+        depth_file>>tmp;
+        data.push_back(tmp);
+    }
+    return data;
 }
 
 
