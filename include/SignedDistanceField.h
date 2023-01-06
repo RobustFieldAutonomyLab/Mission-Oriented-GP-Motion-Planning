@@ -116,7 +116,7 @@ inline std::vector<Matrix> signedDistanceField3D(std::vector<Matrix> ground_trut
 }
 
 inline gpmp2::SignedDistanceField* buildSDF(
-        double cell_size, double cell_size_z, Point3 origin, Matrix seafloor_map) {
+        double cell_size, double cell_size_z, Point3 origin, Matrix &seafloor_map) {
     auto s_max = seafloor_map.maxCoeff();
     auto s_min = seafloor_map.minCoeff();
     int rows = seafloor_map.rows();
@@ -143,6 +143,19 @@ inline gpmp2::SignedDistanceField* buildSDF(
         }
         data_3D.push_back(data);
     }
+
+    for (int i=0;i<rows;i++){
+        for(int j=0; j<cols; j++){
+            vector<double> all_z;
+            for (int z=0; z < z_level; z++){
+                if (data_3D[z](i,j) == 1){
+                    all_z.push_back(origin.z() + cell_size_z * z);
+                }
+            }
+            seafloor_map(i,j) = *max_element(all_z.begin(), all_z.end());
+        }
+    }
+
     std::vector<Matrix> fields = signedDistanceField3D(data_3D, cell_size);
     int level = 0;
     for (auto field : fields){

@@ -47,12 +47,12 @@ namespace gpmp2 {
             const double total_eps = robot_.sphere_radius(sph_idx) + epsilon_;
 
             if (H1) {
-                Matrix16 Jerr_point;
+                Matrix13 Jerr_point;
                 err(sph_idx) = SeafloorCost(sph_centers[sph_idx], sf_, total_eps, Jerr_point);
 
                 // chain rules
-//                Jerr_conf.row(sph_idx) = Jerr_point * J_px_jp[sph_idx];
-                Jerr_conf.row(sph_idx) = Jerr_point;
+                Jerr_conf.row(sph_idx) = Jerr_point * J_px_jp[sph_idx];
+//                Jerr_conf.row(sph_idx) = Jerr_point;
 
             } else {
                 err(sph_idx) = SeafloorCost(sph_centers[sph_idx], sf_, total_eps);

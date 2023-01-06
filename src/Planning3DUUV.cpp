@@ -20,10 +20,11 @@ Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
 
 
 }
-void Planning3DUUV::buildMap(double cell_size, double cell_size_z,
+Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
               Point3 origin, Matrix seafloor_map){
     sdf = buildSDF(cell_size, cell_size_z, origin, seafloor_map);
     sf = new Seafloor(origin, cell_size, seafloor_map);
+    return seafloor_map;
 }
 
 void Planning3DUUV::buildCurrentGrid(double cell_size, double cell_size_z, Point3 origin,
