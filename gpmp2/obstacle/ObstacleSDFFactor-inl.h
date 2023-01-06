@@ -25,8 +25,10 @@ gtsam::Vector ObstacleSDFFactor<ROBOT>::evaluateError(
   // run forward kinematics of this configuration
   vector<Point3> sph_centers;
   vector<Matrix> J_px_jp;
-  if (H1)
-    robot_.sphereCenters(conf, sph_centers, J_px_jp);
+  if (H1){
+      robot_.sphereCenters(conf, sph_centers, J_px_jp);
+//      cout<<*H1<<endl;
+  }
   else
     robot_.sphereCenters(conf, sph_centers);
 

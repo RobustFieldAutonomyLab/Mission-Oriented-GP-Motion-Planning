@@ -43,21 +43,21 @@ void simplier(Matrix seafloor_map, vector<Matrix> grid_u, vector<Matrix> grid_v)
             vs.push_back(avg_vel);
     }
     Planning3DUUVParameter param;
-    param.use_vehicle_dynamics = true;
+    param.use_vehicle_dynamics = false;
     param.dynamics_sigma = 0.01;
 
-    param.obstacle_epsilon_dist = 1;
+    param.obstacle_epsilon_dist = 10;
     param.obstacle_cost_sigma = 0.2;
 
     param.vehicle_size = 0.2;
 
-    param.seafloor_mission = true;
+    param.seafloor_mission = false;
     param.seafloor_cost_sigma = 0.2;
     param.seafloor_dist = 1;
 
     param.check_inter = 5;
 
-    param.use_current = true;
+    param.use_current = false;
 
     Planning3DUUV p3d(param);
     p3d.buildMap(1,1,Point3(0,0,-4243),seafloor_map);

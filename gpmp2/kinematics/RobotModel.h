@@ -87,7 +87,6 @@ public:
           sph_centers[sph_idx] = link_poses[body_spheres_[sph_idx].link_id].transform_from(
               body_spheres_[sph_idx].center, J_point_pose);
           (*J_point_conf)[sph_idx] = J_point_pose * J_pose_jp[body_spheres_[sph_idx].link_id];
-
         } else {
           sph_centers[sph_idx] = link_poses[body_spheres_[sph_idx].link_id].transform_from(
               body_spheres_[sph_idx].center);
