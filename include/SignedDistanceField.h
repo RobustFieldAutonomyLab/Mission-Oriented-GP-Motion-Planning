@@ -146,7 +146,7 @@ inline gpmp2::SignedDistanceField* buildSDF(
 
     for (int i=0;i<rows;i++){
         for(int j=0; j<cols; j++){
-            vector<double> all_z;
+            std::vector<double> all_z;
             for (int z=0; z < z_level; z++){
                 if (data_3D[z](i,j) == 1){
                     all_z.push_back(origin.z() + cell_size_z * z);

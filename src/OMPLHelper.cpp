@@ -1,18 +1,36 @@
 #include "OMPLHelper.h"
 #include "../include/Visualization.h"
+#include "../include/SignedDistanceField.h"
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
+ob::OptimizationObjectivePtr multiObjective(const ob::SpaceInformationPtr& si,
+                                            gpmp2::Seafloor sf, double dist_sf,
+                                            gpmp2::SignedDistanceField sdf, double dist_sdf){
+    ob::OptimizationObjectivePtr vehicleDynamicsObj(new vehicleDynamicsObjective(si));
+    ob::OptimizationObjectivePtr seafloorFollowingObj(new seafloorFollowingObjective(si,sf, dist_sf));
+    ob::OptimizationObjectivePtr signedDistanceFieldObj(new signedDistanceFieldObjective(si, sdf, dist_sdf));
+
+    ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);
+    opt->addObjective(vehicleDynamicsObj, 1.0);
+    opt->addObjective(seafloorFollowingObj, 10.0);
+    opt->addObjective(signedDistanceFieldObj, 10.0);
+
+    return ob::OptimizationObjectivePtr(opt);
+}
+
 OMPLHelper::OMPLHelper(const char *file_name, OMPLParam params):
     vehicle_size_(params.vehicle_size_), origin_(params.origin_),
-        cell_size_(params.cell_size_), method_(params.method_){
+        cell_size_(params.cell_size_), method_(params.method_),
+        dist_sdf_(params.dist_sdf_), dist_sf_(params.dist_sf_){
     bool ok = false;
     double s_max, s_min;
     try
     {
         gtsam::Matrix data = loadSeaFloorData(file_name);
         sf_ = new gpmp2::Seafloor(params.origin_, params.cell_size_, data);
+        sdf_ = buildSDF(cell_size_, params.cell_size_z_, origin_, data);
         s_max = data.maxCoeff();
         s_min = data.minCoeff();
         ok = true;
@@ -50,10 +68,13 @@ OMPLHelper::OMPLHelper(const char *file_name, OMPLParam params):
 //        space->setup();
 //        ss_->getSpaceInformation()->setStateValidityCheckingResolution(0.01);
 
+        ss_->setOptimizationObjective(multiObjective(ss_->getSpaceInformation(), *sf_, dist_sf_,
+                                                     *sdf_, dist_sdf_));
+
         if(method_ == RRTStar)
             ss_->setPlanner(std::make_shared<og::RRTstar>(ss_->getSpaceInformation()));
         else if(method_ == LBKPiece)
-        ss_->setPlanner(std::make_shared<og::LBKPIECE1>(ss_->getSpaceInformation()));
+            ss_->setPlanner(std::make_shared<og::LBKPIECE1>(ss_->getSpaceInformation()));
 
     }
 }
@@ -134,3 +155,4 @@ bool OMPLHelper::isStateValid(const ompl::base::State *state) const
     else
         return false;
 }
+
