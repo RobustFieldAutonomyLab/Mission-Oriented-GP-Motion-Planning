@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(GPMP_STR)
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_INIT} -std=c++14 -fPIC")
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_INIT} -std=c++11 -fPIC")
 
 # Find GTSAM components
 find_package(GTSAM REQUIRED) # Uses installed package
@@ -10,8 +10,12 @@ include_directories(${GTSAM_INCLUDE_DIR})
 set(GTSAM_LIBRARIES gtsam)
 
 # Boost - same requirement as gtsam
-find_package(Boost 1.55 REQUIRED system serialization filesystem thread date_time timer)
+find_package(Boost 1.55 REQUIRED system serialization filesystem thread date_time timer system program_options)
 include_directories(${Boost_INCLUDE_DIR})
+
+#OMPL - for comparing
+find_package(ompl REQUIRED)
+include_directories(${OMPL_INCLUDE_DIR})
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -45,16 +49,6 @@ add_library(extern_gpmp2 ${gpmp2_srcs})
 target_link_libraries(extern_gpmp2
         ${Boost_LIBRARIES}
         gtsam)
-
-# add_subdirectory(extern/pybind11)
-# pybind11_add_module(GPPlanning src/wrapper.cpp
-#         src/Planning2D.cpp
-#         src/Planning3D.cpp)
-# target_link_libraries(GPPlanning PRIVATE
-#         pybind11::module
-#         extern_gpmp2
-#         ${Boost_LIBRARIES}
-#         gtsam)
 
 add_library(planning include/Planning.h
         src/Planning2D.cpp
@@ -101,3 +95,18 @@ target_link_libraries(testMobile3D PUBLIC
         extern_gpmp2
         ${Boost_LIBRARIES}
         gtsam)
+
+add_executable(testRRTstar test/RRTstarPlanning.cpp src/OMPLHelper.cpp)
+target_link_libraries(testRRTstar PUBLIC
+        ompl
+        Threads::Threads
+        ${Boost_LIBRARIES}
+        gtsam
+        matplot)
+
+add_executable(testKPiece test/KPiecePlanning.cpp)
+target_link_libraries(testKPiece PUBLIC
+        ompl
+        Threads::Threads
+        ${Boost_LIBRARIES}
+        matplot)

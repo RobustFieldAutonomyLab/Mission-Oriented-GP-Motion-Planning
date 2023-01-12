@@ -28,6 +28,14 @@ public:
 
     ~Seafloor() {}
 
+    gtsam::Matrix getData(){
+        return data_;
+    }
+
+    double getRowScale(){return field_rows_ * cell_size_;}
+
+    double getColScale(){return field_cols_ * cell_size_;}
+
     inline double getDistance(const gtsam::Point3& point) const {
         const float_index pidx = convertPoint2toCell(gtsam::Point2(point.x(), point.y()));
         const double lr = floor(pidx.first), lc = floor(pidx.second);
@@ -47,7 +55,6 @@ public:
     inline float_index convertPoint2toCell(const gtsam::Point2& point) const {
         if (point.x() < origin_.x() || point.x() > (origin_.x() + (field_cols_-1.0)*cell_size_) ||
             point.y() < origin_.y() || point.y() > (origin_.y() + (field_rows_-1.0)*cell_size_) ) {
-
             throw SDFQueryOutOfRange();
         }
 

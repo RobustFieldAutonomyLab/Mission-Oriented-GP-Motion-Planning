@@ -55,7 +55,7 @@ void simplier(Matrix seafloor_map, vector<Matrix> grid_u, vector<Matrix> grid_v)
     param.seafloor_cost_sigma = 0.1;
     param.seafloor_dist = 1;
 
-    param.check_inter = 10;
+    param.check_inter = 10;//
 
     param.use_current = false;
 
