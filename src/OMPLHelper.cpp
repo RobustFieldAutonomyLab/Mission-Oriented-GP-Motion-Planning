@@ -7,15 +7,16 @@ namespace og = ompl::geometric;
 
 ob::OptimizationObjectivePtr multiObjective(const ob::SpaceInformationPtr& si,
                                             gpmp2::Seafloor sf, double dist_sf,
-                                            gpmp2::SignedDistanceField sdf, double dist_sdf){
+                                            gpmp2::SignedDistanceField sdf, double dist_sdf,
+                                            double w_vd = 1, double w_sdf = 1, double w_sf = 1){
     ob::OptimizationObjectivePtr vehicleDynamicsObj(new vehicleDynamicsObjective(si));
     ob::OptimizationObjectivePtr seafloorFollowingObj(new seafloorFollowingObjective(si,sf, dist_sf));
     ob::OptimizationObjectivePtr signedDistanceFieldObj(new signedDistanceFieldObjective(si, sdf, dist_sdf));
 
     ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);
-    opt->addObjective(vehicleDynamicsObj, 1.0);
-    opt->addObjective(seafloorFollowingObj, 10.0);
-    opt->addObjective(signedDistanceFieldObj, 10.0);
+    opt->addObjective(vehicleDynamicsObj, w_vd);
+    opt->addObjective(seafloorFollowingObj, w_sf);
+    opt->addObjective(signedDistanceFieldObj, w_sdf);
 
     return ob::OptimizationObjectivePtr(opt);
 }
@@ -69,7 +70,7 @@ OMPLHelper::OMPLHelper(const char *file_name, OMPLParam params):
 //        ss_->getSpaceInformation()->setStateValidityCheckingResolution(0.01);
 
         ss_->setOptimizationObjective(multiObjective(ss_->getSpaceInformation(), *sf_, dist_sf_,
-                                                     *sdf_, dist_sdf_));
+                             *sdf_, dist_sdf_, params.w_vd_, params.w_sdf_, params.w_sf_));
 
         if(method_ == RRTStar)
             ss_->setPlanner(std::make_shared<og::RRTstar>(ss_->getSpaceInformation()));

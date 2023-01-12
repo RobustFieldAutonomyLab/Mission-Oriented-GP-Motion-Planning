@@ -30,6 +30,10 @@ struct OMPLParam{
     double dist_sdf_;
     double dist_sf_;
 
+    double w_sf_;
+    double w_sdf_;
+    double w_vd_;
+
 };
 
 class OMPLHelper

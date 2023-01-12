@@ -46,14 +46,14 @@ void simplier(Matrix seafloor_map, vector<Matrix> grid_u, vector<Matrix> grid_v)
     param.use_vehicle_dynamics = true;
     param.dynamics_sigma = 0.01;
 
-    param.obstacle_epsilon_dist = 0.1;
+    param.obstacle_epsilon_dist = 3;
     param.obstacle_cost_sigma = 0.2;
 
     param.vehicle_size = 0.2;
 
     param.seafloor_mission = true;
     param.seafloor_cost_sigma = 0.1;
-    param.seafloor_dist = 1;
+    param.seafloor_dist = 5;
 
     param.check_inter = 10;//
 
