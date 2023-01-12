@@ -99,7 +99,7 @@ bool OMPLHelper::plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt){
     ss_->setStartAndGoalStates(start, goal);
     // generate a few solutions; all will be added to the goal;
 
-    ss_->solve(1.0);
+    ss_->solve(10000.0);
 
     const std::size_t ns = ss_->getProblemDefinition()->getSolutionCount();
     OMPL_INFORM("Found %d solutions", (int)ns);

@@ -11,9 +11,9 @@ int main(int /*argc*/, char ** /*argv*/)
     params.cell_size_z_ = 1;
     params.origin_ = gtsam::Point3(0, 0, -4243);
     params.dist_sdf_ = 3;
-    params.dist_sdf_ = 5;
+    params.dist_sf_ = 5;
     params.w_vd_ = 1;
-    params.w_sf_ = 100000;
+    params.w_sf_ = 100000000;
     params.w_sdf_ = 1;
 
     OMPLHelper env("../data/depth_grid2.csv", params);
