@@ -104,9 +104,10 @@ target_link_libraries(testRRTstar PUBLIC
         gtsam
         matplot)
 
-add_executable(testKPiece test/KPiecePlanning.cpp)
+add_executable(testKPiece test/KPiecePlanning.cpp src/OMPLHelper.cpp)
 target_link_libraries(testKPiece PUBLIC
         ompl
         Threads::Threads
         ${Boost_LIBRARIES}
+        gtsam
         matplot)
