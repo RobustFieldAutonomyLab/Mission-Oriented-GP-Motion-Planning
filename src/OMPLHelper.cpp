@@ -9,12 +9,12 @@ ob::OptimizationObjectivePtr multiObjective(const ob::SpaceInformationPtr& si,
                                             gpmp2::Seafloor sf, double dist_sf,
                                             gpmp2::SignedDistanceField sdf, double dist_sdf,
                                             double w_vd = 1, double w_sdf = 1, double w_sf = 1){
-//    ob::OptimizationObjectivePtr vehicleDynamicsObj(new vehicleDynamicsObjective(si));
+    ob::OptimizationObjectivePtr vehicleDynamicsObj(new vehicleDynamicsObjective(si));
     ob::OptimizationObjectivePtr seafloorFollowingObj(new seafloorFollowingObjective(si,sf, dist_sf));
     ob::OptimizationObjectivePtr signedDistanceFieldObj(new signedDistanceFieldObjective(si, sdf, dist_sdf));
 
     ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);
-//    opt->addObjective(vehicleDynamicsObj, w_vd);
+    opt->addObjective(vehicleDynamicsObj, w_vd);
     opt->addObjective(seafloorFollowingObj, w_sf);
     opt->addObjective(signedDistanceFieldObj, w_sdf);
 
@@ -98,7 +98,6 @@ bool OMPLHelper::plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt){
     goal->rotation().setAxisAngle(rot_g(0), rot_g(1),rot_g(2), rot_g(3));
     ss_->setStartAndGoalStates(start, goal);
     // generate a few solutions; all will be added to the goal;
-
     ss_->solve(100.0);
 
     const std::size_t ns = ss_->getProblemDefinition()->getSolutionCount();
