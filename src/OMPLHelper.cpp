@@ -9,12 +9,12 @@ ob::OptimizationObjectivePtr multiObjective(const ob::SpaceInformationPtr& si,
                                             gpmp2::Seafloor sf, double dist_sf,
                                             gpmp2::SignedDistanceField sdf, double dist_sdf,
                                             double w_vd = 1, double w_sdf = 1, double w_sf = 1){
-    ob::OptimizationObjectivePtr vehicleDynamicsObj(new vehicleDynamicsObjective(si));
+//    ob::OptimizationObjectivePtr vehicleDynamicsObj(new vehicleDynamicsObjective(si));
     ob::OptimizationObjectivePtr seafloorFollowingObj(new seafloorFollowingObjective(si,sf, dist_sf));
     ob::OptimizationObjectivePtr signedDistanceFieldObj(new signedDistanceFieldObjective(si, sdf, dist_sdf));
 
     ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);
-    opt->addObjective(vehicleDynamicsObj, w_vd);
+//    opt->addObjective(vehicleDynamicsObj, w_vd);
     opt->addObjective(seafloorFollowingObj, w_sf);
     opt->addObjective(signedDistanceFieldObj, w_sdf);
 
@@ -99,16 +99,16 @@ bool OMPLHelper::plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt){
     ss_->setStartAndGoalStates(start, goal);
     // generate a few solutions; all will be added to the goal;
 
-    ss_->solve(1.0);
+    ss_->solve(100.0);
 
     const std::size_t ns = ss_->getProblemDefinition()->getSolutionCount();
     OMPL_INFORM("Found %d solutions", (int)ns);
     if (ss_->haveSolutionPath())
     {
-        ss_->simplifySolution();
+//        ss_->simplifySolution();
 
         og::PathGeometric &p = ss_->getSolutionPath();
-        ss_->getPathSimplifier()->simplifyMax(p);
+//        ss_->getPathSimplifier()->simplifyMax(p);
         ss_->getPathSimplifier()->smoothBSpline(p);
 
         return true;
@@ -129,12 +129,16 @@ void OMPLHelper::recordSolution()
     og::PathGeometric &p = ss_->getSolutionPath();
     p.interpolate();
     std::vector<double> opt_x, opt_y, opt_z;
+    std::ofstream file;
+    file.open ("result.txt");
     for (std::size_t i = 0; i < p.getStateCount(); ++i)
     {
         opt_x.push_back(p.getState(i)->as<ob::SE3StateSpace::StateType>()->getX());
         opt_y.push_back(p.getState(i)->as<ob::SE3StateSpace::StateType>()->getY());
         opt_z.push_back(p.getState(i)->as<ob::SE3StateSpace::StateType>()->getZ());
+        file << opt_x[i] << " "<< opt_y[i] << " " <<opt_z[i] << " " <<std::endl;
     }
+    file.close();
     auto l = matplot::plot3(opt_x, opt_y, opt_z,"-ob");
     matplot::show();
 }
