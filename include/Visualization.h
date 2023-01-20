@@ -11,6 +11,9 @@
 #include <gtsam/geometry/Point2.h>
 #include <fstream>
 
+enum PLOT_TYPE{MESH, POINT, DOWNSIZE_MESH};
+
+
 inline gtsam::Point2 get_center(double x, double y, double origin_x, double origin_y, double cell_size ){
     gtsam::Point2 center = gtsam::Point2(int( (y-origin_y)/cell_size ),
                            int( (x-origin_x)/cell_size ) );
@@ -44,7 +47,7 @@ inline void plotEvidenceMap3D(gtsam::Matrix prob_grid,
                        double origin_x,
                        double origin_y,
                        double cell_size,
-                       int type){
+                       PLOT_TYPE type){
     using namespace matplot;
     int grid_rows = prob_grid.rows();
     int grid_cols = prob_grid.cols();
@@ -52,8 +55,9 @@ inline void plotEvidenceMap3D(gtsam::Matrix prob_grid,
     double grid_corner_y = origin_y + (grid_rows - 1) * cell_size;
     std::vector<std::vector<double>> Z;
 
-    if (type == 0){
-        auto [X, Y] = meshgrid(iota(origin_x, cell_size, grid_corner_x),
+    if (type == MESH){
+        auto [X, Y] =
+                meshgrid(iota(origin_x, cell_size, grid_corner_x),
                                iota(origin_y, cell_size, grid_corner_y));
         for (int i=0; i < grid_rows; i++){
             std::vector<double> this_line_Z;
@@ -64,7 +68,22 @@ inline void plotEvidenceMap3D(gtsam::Matrix prob_grid,
         }
         mesh(X, Y, Z);
     }
-    else if (type == 1){
+    else if (type == DOWNSIZE_MESH){
+        int grid_size = std::max(grid_cols, grid_rows);
+        double scale = double(grid_size) / 100;
+        auto [X, Y] =
+                meshgrid(iota(origin_x, cell_size * scale, grid_corner_x),
+                               iota(origin_y, cell_size * scale, grid_corner_y));
+        for (int i=0; i < grid_rows; i+=scale){
+            std::vector<double> this_line_Z;
+            for (int j = 0; j < grid_cols; j+=scale){
+                this_line_Z.push_back(prob_grid(i,j));
+            }
+            Z.push_back(this_line_Z);
+        }
+        mesh(X, Y, Z);
+    }
+    else if (type == POINT){
         std::vector<double> X, Y, Z;
 
         for (int i=0; i < grid_rows; i++){

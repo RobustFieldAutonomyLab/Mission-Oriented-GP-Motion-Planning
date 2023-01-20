@@ -1,6 +1,9 @@
 #include "OMPLHelper.h"
 #include "../include/Visualization.h"
 #include "../include/SignedDistanceField.h"
+#include <ompl/base/ConstrainedSpaceInformation.h>
+#include <ompl/base/spaces/constraint/ProjectedStateSpace.h>
+#include <ompl/geometric/planners/AnytimePathShortening.h>
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -8,6 +11,7 @@ namespace og = ompl::geometric;
 ob::OptimizationObjectivePtr multiObjective(const ob::SpaceInformationPtr& si,
                                             gpmp2::Seafloor sf, double dist_sf,
                                             gpmp2::SignedDistanceField sdf, double dist_sdf,
+                                            double cost_thres = 100,
                                             double w_vd = 1, double w_sdf = 1, double w_sf = 1){
     ob::OptimizationObjectivePtr vehicleDynamicsObj(new vehicleDynamicsObjective(si));
     ob::OptimizationObjectivePtr seafloorFollowingObj(new seafloorFollowingObjective(si,sf, dist_sf));
@@ -17,6 +21,7 @@ ob::OptimizationObjectivePtr multiObjective(const ob::SpaceInformationPtr& si,
     opt->addObjective(vehicleDynamicsObj, w_vd);
     opt->addObjective(seafloorFollowingObj, w_sf);
     opt->addObjective(signedDistanceFieldObj, w_sdf);
+    opt->setCostThreshold(ob::Cost(cost_thres));
 
     return ob::OptimizationObjectivePtr(opt);
 }
@@ -70,12 +75,15 @@ OMPLHelper::OMPLHelper(const char *file_name, OMPLParam params):
 //        ss_->getSpaceInformation()->setStateValidityCheckingResolution(0.01);
 
         ss_->setOptimizationObjective(multiObjective(ss_->getSpaceInformation(), *sf_, dist_sf_,
-                             *sdf_, dist_sdf_, params.w_vd_, params.w_sdf_, params.w_sf_));
+                             *sdf_, dist_sdf_, params.cost_thres_, params.w_vd_, params.w_sdf_, params.w_sf_));
 
         if(method_ == RRTStar)
             ss_->setPlanner(std::make_shared<og::RRTstar>(ss_->getSpaceInformation()));
-        else if(method_ == LBKPiece)
-            ss_->setPlanner(std::make_shared<og::LBKPIECE1>(ss_->getSpaceInformation()));
+        else if(method_ == LBKPiece){
+            ob::PlannerPtr planner = std::make_shared<og::AnytimePathShortening>(ss_->getSpaceInformation());
+            planner->as<og::AnytimePathShortening>()->setPlanners("LBKPIECE");
+            ss_->setPlanner(planner);
+        }
 
     }
 }
@@ -83,6 +91,7 @@ OMPLHelper::OMPLHelper(const char *file_name, OMPLParam params):
 bool OMPLHelper::plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt){
     if (!ss_)
         return false;
+
     ob::ScopedState<ob::SE3StateSpace>start(ss_->getSpaceInformation());
     start->setX(start_pt.translation().x());
     start->setY(start_pt.translation().y());
@@ -98,7 +107,7 @@ bool OMPLHelper::plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt){
     goal->rotation().setAxisAngle(rot_g(0), rot_g(1),rot_g(2), rot_g(3));
     ss_->setStartAndGoalStates(start, goal);
     // generate a few solutions; all will be added to the goal;
-    ss_->solve(100.0);
+    ss_->solve(10);
 
     const std::size_t ns = ss_->getProblemDefinition()->getSolutionCount();
     OMPL_INFORM("Found %d solutions", (int)ns);
@@ -121,7 +130,7 @@ void OMPLHelper::recordSolution()
     if (!ss_ || !ss_->haveSolutionPath())
         return;
 
-    plotEvidenceMap3D(sf_->getData(),0,0,1,0);
+    plotEvidenceMap3D(sf_->getData(),0,0,1,MESH);
 
     matplot::hold(matplot::on);
 

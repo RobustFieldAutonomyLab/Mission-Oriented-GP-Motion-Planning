@@ -55,20 +55,20 @@ inline Matrix signedDistanceField2D(Matrix ground_truth_map, double cell_size){
     return field * cell_size;
 }
 
-inline std::vector<Matrix> signedDistanceField3D(std::vector<Matrix> ground_truth_map, double cell_size){
+inline std::vector<Matrix> signedDistanceField3D(const std::vector<Matrix> &ground_truth_map, double cell_size){
     Matrix one_map;
-
     int z = ground_truth_map.size();
     int rows = ground_truth_map[0].rows();
     int cols = ground_truth_map[0].cols();
 
     one_map.setOnes(rows, cols);
 
-    int sum = 0;
+    bool all_zero = true;
     bool cur_map[z*rows*cols];
     bool inv_map[z*rows*cols];
-    for (int k = 0; k < ground_truth_map.size(); k++){
-        sum += ground_truth_map[k].sum();
+    for (int k = 0; k < z; k++){
+        if (ground_truth_map[k].sum() != 0)
+            all_zero = false;
         for (int i=0; i<rows; i++){
             for(int j=0; j<cols; j++){
                 cur_map[k*rows*cols + i*cols+j] =  ground_truth_map[k](i,j);
@@ -79,7 +79,7 @@ inline std::vector<Matrix> signedDistanceField3D(std::vector<Matrix> ground_trut
 
     std::vector<Matrix> field_3D;
 
-    if(sum == 0){
+    if(all_zero){
         Matrix this_layer;
         this_layer.setOnes(rows, cols);
         for (int i = 0; i < z; i++){
@@ -135,7 +135,11 @@ inline gpmp2::SignedDistanceField* buildSDF(
         data.setZero(seafloor_map.rows(), seafloor_map.cols());
         for (int i=0;i<rows;i++){
             for(int j=0;j<cols;j++){
-                if ( z * cell_size_z + origin.z() < seafloor_map(i,j)){
+                if (seafloor_map(i,j) >= 0){
+                    //mark occupied for all lands
+                    data(i,j) = 1;
+                }
+                else if ( z * cell_size_z + origin.z() < seafloor_map(i,j)){
                     data(i,j) = 1;
                 }
 //                cout<< z * cell_size_z + origin.z() <<endl;

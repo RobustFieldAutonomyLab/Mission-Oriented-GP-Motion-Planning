@@ -95,7 +95,7 @@ void test_edt3D(){
 
 void test_getDistance(){
     Matrix sf = loadSeaFloorData("../data/depth_grid2.csv");
-    plotEvidenceMap3D(sf, 0, 0, 1, 0);
+    plotEvidenceMap3D(sf, 0, 0, 1, MESH);
     gpmp2::Seafloor sf_model(Point3(0,0,-4243), 1, sf);
     vector<Point3> target{Point3(40,20,-4200),
                           Point3(23.4, 32.1, -4194.8),

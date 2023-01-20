@@ -96,18 +96,44 @@ target_link_libraries(testMobile3D PUBLIC
         ${Boost_LIBRARIES}
         gtsam)
 
-add_executable(testRRTstar test/RRTstarPlanning.cpp src/OMPLHelper.cpp)
-target_link_libraries(testRRTstar PUBLIC
-        ompl
+add_executable(testNYC test/Mobile3DNYC.cpp)
+target_link_libraries(testNYC PUBLIC
+        planning
+        matplot
         Threads::Threads
+        extern_gpmp2
+        ${Boost_LIBRARIES}
+        gtsam)
+
+add_library(OMPLPlanning include/OMPLObjective.h
+        include/OMPLConstraint.h
+        src/OMPLHelper.cpp)
+target_link_libraries(OMPLPlanning
+        ompl
+        matplot
+        gtsam
+        ${Boost_LIBRARIES})
+
+add_executable(testRRTstar test/RRTstarPlanning.cpp)
+target_link_libraries(testRRTstar PUBLIC
+        OMPLPlanning
+        ompl
         ${Boost_LIBRARIES}
         gtsam
         matplot)
 
-add_executable(testKPiece test/KPiecePlanning.cpp src/OMPLHelper.cpp)
+add_executable(testKPiece test/KPiecePlanning.cpp)
 target_link_libraries(testKPiece PUBLIC
+        OMPLPlanning
         ompl
-        Threads::Threads
+        ${Boost_LIBRARIES}
+        gtsam
+        matplot)
+
+add_executable(testGA test/GAPlanning.cpp)
+target_link_libraries(testKPiece PUBLIC
+        OMPLPlanning
+        ompl
         ${Boost_LIBRARIES}
         gtsam
         matplot)

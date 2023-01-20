@@ -72,7 +72,7 @@ void simplier(Matrix seafloor_map){
         Y.push_back(pose[1]);
         Z.push_back(pose[2]);
     }
-    plotEvidenceMap3D(seafloor_map,0,0,1,0);
+    plotEvidenceMap3D(seafloor_map,0,0,1,MESH);
     matplot::hold(matplot::on);
     auto l = matplot::plot3(X, Y, Z,"-ob");
     matplot::show();
