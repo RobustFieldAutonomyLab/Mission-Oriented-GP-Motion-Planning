@@ -130,10 +130,10 @@ target_link_libraries(testKPiece PUBLIC
         gtsam
         matplot)
 
-add_executable(testGA test/GAPlanning.cpp)
-target_link_libraries(testKPiece PUBLIC
-        OMPLPlanning
-        ompl
-        ${Boost_LIBRARIES}
-        gtsam
-        matplot)
+#add_executable(testGA test/GAPlanning.cpp)
+#target_link_libraries(testKPiece PUBLIC
+#        OMPLPlanning
+#        ompl
+#        ${Boost_LIBRARIES}
+#        gtsam
+#        matplot)

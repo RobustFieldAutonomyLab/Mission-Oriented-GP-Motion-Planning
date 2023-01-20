@@ -95,18 +95,18 @@ void test_edt3D(){
 
 void test_getDistance(){
     Matrix sf = loadSeaFloorData("../data/depth_grid2.csv");
-    plotEvidenceMap3D(sf, 0, 0, 1, MESH);
-    gpmp2::Seafloor sf_model(Point3(0,0,-4243), 1, sf);
-    vector<Point3> target{Point3(40,20,-4200),
-                          Point3(23.4, 32.1, -4194.8),
-                          Point3(21.5, 11.5, -4125.5)};
+    plotEvidenceMap3D(sf, 0, 0, 10, MESH);
+    gpmp2::Seafloor sf_model(Point3(0,0,-4243), 10, sf);
+    vector<Point3> target{Point3(400,200,-4200),
+                          Point3(234, 321, -4194.8),
+                          Point3(215, 115, -4125.5)};
     matplot::hold(matplot::on);
     for (auto t : target){
         double d = sf_model.getDistance(t);
         cout<< d <<endl;
         vector<double> X{t.x(), t.x()};
         vector<double> Y{t.y(), t.y()};
-        vector<double> Z{t.z(), t.z() - d};
+        vector<double> Z{t.z(), t.z()-d};
         auto l = matplot::plot3(X, Y, Z,"-ob")->line_width(2);
     }
 
@@ -146,7 +146,7 @@ void test_waterCurrentGrid(){
 }
 
 int main() {
-    test_waterCurrentGrid();
+    test_getDistance();
 
     return 0;
 }

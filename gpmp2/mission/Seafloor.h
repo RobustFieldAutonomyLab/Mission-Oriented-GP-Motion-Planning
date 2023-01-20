@@ -44,11 +44,12 @@ public:
                 hri = static_cast<size_t>(hr), hci = static_cast<size_t>(hc);
         const double zlrhc = data_(lri, hci), zhrhc = data_(hri, hci),
                 zlrlc = data_(lri, lci), zhrlc = data_(hri, lci);
-        const double zph = zlrhc + (zhrhc - zlrhc) * (point.y() - lr);
-        const double zpl = zlrlc + (zhrlc - zlrlc) * (point.y() - lr);
-        const double zp = zpl + (zph - zpl) * (point.x() - lc);
+        const double zph = zlrhc + (zhrhc - zlrhc) * (pidx.first - lr);
+        const double zpl = zlrlc + (zhrlc - zlrlc) * (pidx.first - lr);
+        const double zp = zpl + (zph - zpl) * (pidx.second - lc);
 //        std::cout<< "lr, hr, lc, hc:" << lr<<", "<<hr<<
 //        ", "<<lc<<", "<<hc<<std::endl;
+//        std::cout<< "zp:" << zp <<std::endl;
         return (point.z() - zp);
     }
 
