@@ -27,6 +27,14 @@ Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
     return seafloor_map;
 }
 
+Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
+                               Point3 origin, Matrix seafloor_map,
+                               string sdf_path){
+    sdf = loadSDF(cell_size, cell_size_z, origin, seafloor_map, sdf_path);
+    sf = new Seafloor(origin, cell_size, seafloor_map);
+    return seafloor_map;
+}
+
 void Planning3DUUV::buildCurrentGrid(double cell_size, double cell_size_z, Point3 origin,
                       vector<Matrix> grid_u, vector<Matrix> grid_v){
     int rows = grid_u[0].rows();

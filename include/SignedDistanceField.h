@@ -173,6 +173,19 @@ inline gpmp2::SignedDistanceField* buildSDF(
 
 }
 
+inline gpmp2::SignedDistanceField* loadSDF(
+        double cell_size, double cell_size_z, Point3 origin, Matrix &seafloor_map,
+        std::string sdf_path) {
+    std::vector<Matrix> sdf_data = loadSDFData(sdf_path, cell_size, cell_size_z, origin.z());
+
+    static gpmp2::SignedDistanceField sdf(
+            origin, cell_size, cell_size_z,
+            sdf_data);
+
+    return &sdf;
+
+}
+
 
 
 #endif //GPMP_STR_SIGNEDDISTANCEFIELD_H
