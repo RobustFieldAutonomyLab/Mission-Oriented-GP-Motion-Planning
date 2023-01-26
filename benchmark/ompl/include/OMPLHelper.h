@@ -19,8 +19,11 @@
 #include "OMPLConstraint.h"
 #include "OMPLObjective.h"
 
+#include "../include/Visualization.h"
+#include "../include/SignedDistanceField.h"
 
-enum OMPLMethod{RRTStar, LBKPiece, GeneticSearch};
+
+enum OMPLMethod{RRTStar, LBKPiece, GeneticAlgorithm};
 
 struct OMPLParam{
     OMPLMethod method_;

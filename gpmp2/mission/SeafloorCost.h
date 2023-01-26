@@ -23,10 +23,12 @@ namespace gpmp2 {
             //the robot is below seafloor, not allowed
             dist = -dist * 10;
             dist_symbol = -10;
+//            dist = 1000;
+//            dist_symbol = 1000;
         }
         else dist_symbol = 1;
 
-        if (dist < eps) {
+        if (dist < eps && dist_symbol == 1) {
             // close enough no error
             if (H_point) *H_point = gtsam::Matrix13::Zero();
                 return 0.0;

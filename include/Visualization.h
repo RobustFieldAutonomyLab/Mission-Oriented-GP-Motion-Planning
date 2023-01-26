@@ -118,8 +118,9 @@ inline gtsam::Matrix loadSeaFloorData(std::string file_name){
 }
 
 inline void draw(std::vector<double> X, std::vector<double> Y, std::vector<double> Z, gtsam::Matrix seafloor_map){
+    matplot::save("1.png");
     matplot::cla();
-    plotEvidenceMap2D(seafloor_map, 1, 1, 1);
+    plotEvidenceMap2D(seafloor_map, 1, 1, 100);
     matplot::hold(matplot::on);
     matplot::plot(X,Y,"-or");
     matplot::arrow(X[0]+3, Y[0]+3, X[0], Y[0]);

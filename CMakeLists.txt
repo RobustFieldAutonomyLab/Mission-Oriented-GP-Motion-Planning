@@ -21,119 +21,14 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 add_subdirectory(third_party/matplotplusplus)
-include_directories(include)
 include_directories(third_party/matplotplusplus/source)
 
-set(gpmp2_subdirs
-        gpmp2/dynamics
-        gpmp2/gp
-        gpmp2/kinematics
-        gpmp2/obstacle
-        gpmp2/mission)
+include_directories(include)
 
-set(gpmp2_srcs)
+add_subdirectory(gpmp2)
 
-# files want to be excluded
-set(excluded_sources "")
+add_subdirectory(src)
+add_subdirectory(tests)
 
-# Library sources
-foreach(subdir ${gpmp2_subdirs})
-    file(GLOB subdir_srcs "${subdir}/*.cpp" "${subdir}/*.h")
-    list(REMOVE_ITEM subdir_srcs "${excluded_sources}")
-
-    list(APPEND gpmp2_srcs ${subdir_srcs})
-    message(STATUS "Building Module: ${subdir}")
-endforeach(subdir)
-
-add_library(extern_gpmp2 ${gpmp2_srcs})
-target_link_libraries(extern_gpmp2
-        ${Boost_LIBRARIES}
-        gtsam)
-
-add_library(planning include/Planning.h
-        src/Planning2D.cpp
-        src/Planning3D.cpp
-        src/Planning3DUUV.cpp)
-target_link_libraries(planning
-        matplot
-        extern_gpmp2
-        ${Boost_LIBRARIES}
-        gtsam)
-
-add_executable(test test/main.cpp)
-target_link_libraries(test PUBLIC
-        planning
-        matplot
-        Threads::Threads
-        extern_gpmp2
-        ${Boost_LIBRARIES}
-        gtsam)
-
-add_executable(testMobile2D test/MobileRobot2DPlanning.cpp)
-target_link_libraries(testMobile2D PUBLIC
-        planning
-        matplot
-        Threads::Threads
-        extern_gpmp2
-        ${Boost_LIBRARIES}
-        gtsam)
-
-add_executable(testPoint3D test/PointRobot3DPlanning.cpp)
-target_link_libraries(testPoint3D PUBLIC
-        planning
-        matplot
-        Threads::Threads
-        extern_gpmp2
-        ${Boost_LIBRARIES}
-        gtsam)
-
-add_executable(testMobile3D test/MobileRobot3DPlanning.cpp)
-target_link_libraries(testMobile3D PUBLIC
-        planning
-        matplot
-        Threads::Threads
-        extern_gpmp2
-        ${Boost_LIBRARIES}
-        gtsam)
-
-add_executable(testNYC test/Mobile3DNYC.cpp)
-target_link_libraries(testNYC PUBLIC
-        planning
-        matplot
-        Threads::Threads
-        extern_gpmp2
-        ${Boost_LIBRARIES}
-        gtsam)
-
-add_library(OMPLPlanning include/OMPLObjective.h
-        include/OMPLConstraint.h
-        src/OMPLHelper.cpp)
-target_link_libraries(OMPLPlanning
-        ompl
-        matplot
-        gtsam
-        ${Boost_LIBRARIES})
-
-add_executable(testRRTstar test/RRTstarPlanning.cpp)
-target_link_libraries(testRRTstar PUBLIC
-        OMPLPlanning
-        ompl
-        ${Boost_LIBRARIES}
-        gtsam
-        matplot)
-
-add_executable(testKPiece test/KPiecePlanning.cpp)
-target_link_libraries(testKPiece PUBLIC
-        OMPLPlanning
-        ompl
-        ${Boost_LIBRARIES}
-        gtsam
-        matplot)
-
-#add_executable(testGA test/GAPlanning.cpp)
-#target_link_libraries(testKPiece PUBLIC
-#        OMPLPlanning
-#        ompl
-#        ${Boost_LIBRARIES}
-#        gtsam
-#        matplot)
+add_subdirectory(benchmark/GA)
+add_subdirectory(benchmark/ompl)

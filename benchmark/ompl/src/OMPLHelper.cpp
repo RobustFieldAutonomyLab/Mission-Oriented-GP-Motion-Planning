@@ -1,6 +1,4 @@
 #include "OMPLHelper.h"
-#include "../include/Visualization.h"
-#include "../include/SignedDistanceField.h"
 #include <ompl/base/ConstrainedSpaceInformation.h>
 #include <ompl/base/spaces/constraint/ProjectedStateSpace.h>
 #include <ompl/geometric/planners/AnytimePathShortening.h>
