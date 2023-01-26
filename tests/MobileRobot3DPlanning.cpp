@@ -83,8 +83,8 @@ void simplier(Matrix seafloor_map, vector<Matrix> grid_u, vector<Matrix> grid_v)
 }
 
 int main(){
-    Matrix data = loadSeaFloorData("../data/depth_grid2.csv");
-    vector<Matrix> current_grid_u = loadCurrentData("../data/u_mean.csv");
-    vector<Matrix> current_grid_v = loadCurrentData("../data/v_mean.csv");
+    Matrix data = loadSeaFloorData("../../data/depth_grid2.csv");
+    vector<Matrix> current_grid_u = loadCurrentData("../../data/u_mean.csv");
+    vector<Matrix> current_grid_v = loadCurrentData("../../data/v_mean.csv");
     simplier(data, current_grid_u, current_grid_v);
 }

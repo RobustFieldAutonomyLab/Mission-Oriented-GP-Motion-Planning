@@ -94,7 +94,7 @@ void test_edt3D(){
 }
 
 void test_getDistance(){
-    Matrix sf = loadSeaFloorData("../data/depth_grid2.csv");
+    Matrix sf = loadSeaFloorData("../../data/depth_grid2.csv");
     plotEvidenceMap3D(sf, 0, 0, 10, MESH);
     gpmp2::Seafloor sf_model(Point3(0,0,-4243), 10, sf);
     vector<Point3> target{Point3(400,200,-4200),
@@ -114,9 +114,9 @@ void test_getDistance(){
 }
 
 void test_waterCurrentGrid(){
-    vector<Matrix> current_grid_u = loadCurrentData("../data/u_mean.csv");
-    vector<Matrix> current_grid_v = loadCurrentData("../data/v_mean.csv");
-    vector<double> current_depth_grid = loadDepthData("../data/current_depth_map.csv");
+    vector<Matrix> current_grid_u = loadCurrentData("../../data/u_mean.csv");
+    vector<Matrix> current_grid_v = loadCurrentData("../../data/v_mean.csv");
+    vector<double> current_depth_grid = loadDepthData("../../data/current_depth_map.csv");
 
     auto wcg = gpmp2::WaterCurrentGrid(Point3(0,0,-5000),
                                        1, 1000, 50, 60, 2,

@@ -84,7 +84,7 @@ int main(){
 //    matplot::show();
 //    planning3D(data);
 ////    matplot::save("1.png");
-    Matrix data = loadSeaFloorData("../data/depth_grid2.csv");
+    Matrix data = loadSeaFloorData("../../data/depth_grid2.csv");
 //    matplot::subplot(2, 1, 0);
 //    plotEvidenceMap3D(data,0,0,1,1);
 //    matplot::hold(true);

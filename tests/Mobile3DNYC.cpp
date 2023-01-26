@@ -167,8 +167,8 @@ void run_big(Matrix seafloor_map, string sdf_path){
 }
 
 int main(){
-    Matrix data = loadSeaFloorData("../data/NYC/depth_grid_NYC_small.csv");
-//    Matrix data = loadSeaFloorData("../data/NYC/depth_grid_NYC.csv");
-//    run_big(data, "../data/NYC/sdfNYC10.txt");
+    Matrix data = loadSeaFloorData("../../data/NYC/depth_grid_NYC_small.csv");
+//    Matrix data = loadSeaFloorData("../../data/NYC/depth_grid_NYC.csv");
+//    run_big(data, "../../data/NYC/sdfNYC10.txt");
     run_small(data);
 }
