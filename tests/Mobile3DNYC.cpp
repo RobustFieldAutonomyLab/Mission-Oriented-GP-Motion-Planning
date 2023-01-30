@@ -53,7 +53,7 @@ void run_small(Matrix seafloor_map){
 
     param.seafloor_mission = true;
     param.seafloor_cost_sigma = 1;
-    param.seafloor_dist = 3;
+    param.seafloor_dist = 2;
 
     param.check_inter = 10;//
 
@@ -73,12 +73,6 @@ void run_small(Matrix seafloor_map){
 //    plotEvidenceMap3D(seafloor_map,0,0,1,POINT);
     auto l = matplot::plot3(X, Y, Z,"-ob");
 //    vector<double> sx, sy, sz;
-//    sx.push_back(500);
-//    sy.push_back(5000);
-//    sz.push_back(-1);
-//    sx.push_back(3000);
-//    sy.push_back(7000);
-//    sz.push_back(-5);
 //    auto l2 = matplot::plot3(sx, sy, sz, "r*");
     matplot::show();
 //    draw(X, Y, Z, seafloor_map);
@@ -86,14 +80,14 @@ void run_small(Matrix seafloor_map){
 
 void run_big(Matrix seafloor_map, string sdf_path){
     double delta_t = 0.4;
-    int total_time_step = 350;
-    Pose3 start_pose = Pose3(Rot3(),Point3(500, 5000, -5));
+    int total_time_step = 500;
+    Pose3 start_pose = Pose3(Rot3(),Point3(400,100,  -5));
     Vector start_vel;
     Vector6 start_vel6;
     start_vel6 << Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0);
     start_vel = start_vel6;
 
-    Pose3 end_pose = Pose3(Rot3(), Point3(3000, 7000, -5));
+    Pose3 end_pose = Pose3(Rot3(), Point3(600, 1000, -5));
     Vector end_vel;
     Vector6 end_vel6;
     end_vel6 << Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0);
@@ -124,24 +118,24 @@ void run_big(Matrix seafloor_map, string sdf_path){
             vs.push_back(avg_vel);
     }
     Planning3DUUVParameter param;
-    param.use_vehicle_dynamics = false;
+    param.use_vehicle_dynamics = true;
     param.dynamics_sigma = 1;
 
-    param.obstacle_epsilon_dist = 3;
-    param.obstacle_cost_sigma = 0.1;
+    param.obstacle_epsilon_dist = 1;
+    param.obstacle_cost_sigma = 1;
 
     param.vehicle_size = 1;
 
     param.seafloor_mission = true;
     param.seafloor_cost_sigma = 1;
-    param.seafloor_dist = 1;
+    param.seafloor_dist = 2;
 
     param.check_inter = 10;//
 
     param.use_current = false;
 
     Planning3DUUV p3d(param);
-    double cell_size = 10;
+    double cell_size = 1;
     double cell_size_z = 1;
     //TODO: edit here
     seafloor_map = p3d.buildMap(cell_size,cell_size_z,Point3(0,0,-35),seafloor_map, sdf_path);
@@ -156,20 +150,14 @@ void run_big(Matrix seafloor_map, string sdf_path){
     matplot::hold(matplot::on);
     auto l = matplot::plot3(X, Y, Z,"-ob");
 //    vector<double> sx, sy, sz;
-//    sx.push_back(500);
-//    sy.push_back(5000);
-//    sz.push_back(-1);
-//    sx.push_back(3000);
-//    sy.push_back(7000);
-//    sz.push_back(-5);
 //    auto l2 = matplot::plot3(sx, sy, sz, "r*");
     matplot::show();
 //    draw(X, Y, Z, seafloor_map);
 }
 
 int main(){
-    Matrix data = loadSeaFloorData("../../data/NYC/depth_grid_NYC_small.csv");
-//    Matrix data = loadSeaFloorData("../../data/NYC/depth_grid_NYC.csv");
-//    run_big(data, "../../data/NYC/sdfNYC10.txt");
-    run_small(data);
+//    Matrix data = loadSeaFloorData("../../data/NYC/depth_grid_NYC_small.csv");
+    Matrix data = loadSeaFloorData("../../data/NYC/depth_grid_NYC.csv");
+    run_big(data, "../../data/NYC/sdfNYC10.txt");
+//    run_small(data);
 }
