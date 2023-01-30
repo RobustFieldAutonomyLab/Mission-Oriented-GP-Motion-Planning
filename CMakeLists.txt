@@ -30,5 +30,5 @@ add_subdirectory(gpmp2)
 add_subdirectory(src)
 add_subdirectory(tests)
 
-add_subdirectory(benchmark/GA)
 add_subdirectory(benchmark/ompl)
+add_subdirectory(benchmark/GA)

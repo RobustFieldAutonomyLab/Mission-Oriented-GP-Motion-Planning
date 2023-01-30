@@ -6,13 +6,13 @@ using namespace std;
 void run_small(Matrix seafloor_map){
     double delta_t = 0.4;
     int total_time_step = 300;
-    Pose3 start_pose = Pose3(Rot3(),Point3(500, 5000, -5));
+    Pose3 start_pose = Pose3(Rot3(),Point3(40,10,  -5));
     Vector start_vel;
     Vector6 start_vel6;
     start_vel6 << Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0);
     start_vel = start_vel6;
 
-    Pose3 end_pose = Pose3(Rot3(), Point3(3000, 7000, -5));
+    Pose3 end_pose = Pose3(Rot3(), Point3(60, 100, -5));
     Vector end_vel;
     Vector6 end_vel6;
     end_vel6 << Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0);
@@ -43,24 +43,24 @@ void run_small(Matrix seafloor_map){
             vs.push_back(avg_vel);
     }
     Planning3DUUVParameter param;
-    param.use_vehicle_dynamics = false;
-    param.dynamics_sigma = 0.01;
+    param.use_vehicle_dynamics = true;
+    param.dynamics_sigma = 1;
 
     param.obstacle_epsilon_dist = 1;
-    param.obstacle_cost_sigma = 0.1;
+    param.obstacle_cost_sigma = 1;
 
-    param.vehicle_size = 0.2;
+    param.vehicle_size = 1;
 
     param.seafloor_mission = true;
-    param.seafloor_cost_sigma = 0.2;
-    param.seafloor_dist = 1;
+    param.seafloor_cost_sigma = 1;
+    param.seafloor_dist = 3;
 
     param.check_inter = 10;//
 
     param.use_current = false;
 
     Planning3DUUV p3d(param);
-    seafloor_map = p3d.buildMap(100,1,Point3(0,0,-35),seafloor_map);
+    seafloor_map = p3d.buildMap(1,1,Point3(0,0,-35),seafloor_map);
     auto result = p3d.optimize(ps, vs, delta_t);
     vector<double> X, Y, Z, X_floor, Z_floor;
     for (auto pose : result){
@@ -68,8 +68,9 @@ void run_small(Matrix seafloor_map){
         Y.push_back(pose.y());
         Z.push_back(pose.z());
     }
-    plotEvidenceMap3D(seafloor_map,0,0,100,DOWNSIZE_MESH);
+    plotEvidenceMap3D(seafloor_map,0,0,1,MESH);
     matplot::hold(matplot::on);
+//    plotEvidenceMap3D(seafloor_map,0,0,1,POINT);
     auto l = matplot::plot3(X, Y, Z,"-ob");
 //    vector<double> sx, sy, sz;
 //    sx.push_back(500);
@@ -123,17 +124,17 @@ void run_big(Matrix seafloor_map, string sdf_path){
             vs.push_back(avg_vel);
     }
     Planning3DUUVParameter param;
-    param.use_vehicle_dynamics = true;
-    param.dynamics_sigma = 0.1;
+    param.use_vehicle_dynamics = false;
+    param.dynamics_sigma = 1;
 
     param.obstacle_epsilon_dist = 3;
     param.obstacle_cost_sigma = 0.1;
 
-    param.vehicle_size = 0.2;
+    param.vehicle_size = 1;
 
     param.seafloor_mission = true;
-    param.seafloor_cost_sigma = 10;
-    param.seafloor_dist = 5;
+    param.seafloor_cost_sigma = 1;
+    param.seafloor_dist = 1;
 
     param.check_inter = 10;//
 
@@ -143,7 +144,7 @@ void run_big(Matrix seafloor_map, string sdf_path){
     double cell_size = 10;
     double cell_size_z = 1;
     //TODO: edit here
-    seafloor_map = p3d.buildMap(cell_size,cell_size_z,Point3(0,0,-33),seafloor_map, sdf_path);
+    seafloor_map = p3d.buildMap(cell_size,cell_size_z,Point3(0,0,-35),seafloor_map, sdf_path);
     auto result = p3d.optimize(ps, vs, delta_t);
     vector<double> X, Y, Z, X_floor, Z_floor;
     for (auto pose : result){

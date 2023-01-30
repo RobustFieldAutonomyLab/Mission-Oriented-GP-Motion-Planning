@@ -5,7 +5,7 @@ using namespace std;
 
 void simplier(Matrix seafloor_map, vector<Matrix> grid_u, vector<Matrix> grid_v){
     double delta_t = 0.4;
-    int total_time_step = 100;
+    int total_time_step = 150;
     Pose3 start_pose = Pose3(Rot3(),Point3(5, 5, -4220));
     Vector start_vel;
     Vector6 start_vel6;
@@ -46,14 +46,16 @@ void simplier(Matrix seafloor_map, vector<Matrix> grid_u, vector<Matrix> grid_v)
     param.use_vehicle_dynamics = true;
     param.dynamics_sigma = 0.01;
 
-    param.obstacle_epsilon_dist = 1;
+    param.obstacle_epsilon_dist = 3;
+//    param.obstacle_epsilon_dist = 1;
     param.obstacle_cost_sigma = 0.2;
 
-    param.vehicle_size = 0.2;
+    param.vehicle_size = 1;
 
     param.seafloor_mission = true;
     param.seafloor_cost_sigma = 0.2;
-    param.seafloor_dist = 1;
+    param.seafloor_dist = 5.2;//at least a little larger than obstacle dist
+//    param.seafloor_dist = 1.2;
 
     param.check_inter = 10;//
 
@@ -72,6 +74,7 @@ void simplier(Matrix seafloor_map, vector<Matrix> grid_u, vector<Matrix> grid_v)
     }
     plotEvidenceMap3D(seafloor_map,0,0,1,MESH);
     matplot::hold(matplot::on);
+//    plotEvidenceMap3D(seafloor_map,0,0,1,POINT);
     auto l = matplot::plot3(X, Y, Z,"-ob");
     vector<double> sx, sy, sz;
     sx.push_back(X[0]);

@@ -30,9 +30,9 @@ inline double simple2DVehicleDynamicsPose2(const gtsam::Pose2& p, const gtsam::V
 inline double simple3DVehicleDynamicsPose3(const gtsam::Pose3& p, const gtsam::Vector6& v,
                                            gtsam::OptionalJacobian<1, 6> Hp = boost::none,
                                            gtsam::OptionalJacobian<1, 6> Hv = boost::none) {
-    double err = 100 * v(1) * v(1) + v(4) * v(4);
+    double err = v(4);
     if (Hp) *Hp = (gtsam::Matrix16() << 0, 0, 0, 0, 0, 0).finished();
-    if (Hv) *Hv = (gtsam::Matrix16() << 0, 200*v(1), 0, 0, 2*v(4), 0).finished();
+    if (Hv) *Hv = (gtsam::Matrix16() << 0, 0, 0, 0, 1, 0).finished();
 
     //TODO: add a scale factor for the angle
     return err;

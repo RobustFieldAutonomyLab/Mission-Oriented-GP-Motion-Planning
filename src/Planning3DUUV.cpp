@@ -134,7 +134,15 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
     //parameters.maxIterations = 100;
 //    graph.print();
     DoglegOptimizer optimizer(graph, init_values);
+    DoglegParams params;
+    params.maxIterations = 10000;
     Values result = optimizer.optimize();
+
+//    ISAM2Params parameters;
+//    ISAM2 isam(parameters);
+//    isam.update(graph, init_values);
+//    Values result = isam.calculateEstimate();
+
     result.print("Final Result:\n");
 
     std::vector<Pose3> out;

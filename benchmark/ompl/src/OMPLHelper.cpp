@@ -78,8 +78,11 @@ OMPLHelper::OMPLHelper(const char *file_name, OMPLParam params):
         if(method_ == RRTStar)
             ss_->setPlanner(std::make_shared<og::RRTstar>(ss_->getSpaceInformation()));
         else if(method_ == LBKPiece){
-            ob::PlannerPtr planner = std::make_shared<og::AnytimePathShortening>(ss_->getSpaceInformation());
-            planner->as<og::AnytimePathShortening>()->setPlanners("LBKPIECE");
+            ob::PlannerPtr planner = std::make_shared<og::KPIECE1>(ss_->getSpaceInformation());
+            ss_->setPlanner(planner);
+        }
+        else if(method_ == PRM){
+            ob::PlannerPtr planner = std::make_shared<og::PRMstar>(ss_->getSpaceInformation());
             ss_->setPlanner(planner);
         }
 

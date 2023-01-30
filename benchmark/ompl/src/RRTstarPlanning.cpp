@@ -17,7 +17,7 @@ int main(int /*argc*/, char ** /*argv*/)
     params.w_sdf_ = 1;
     params.cost_thres_ = 100;
 
-    OMPLHelper env("../data/depth_grid2.csv", params);
+    OMPLHelper env("../../../data/depth_grid2.csv", params);
 
     if (env.plan(gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(5, 5, -4220)),
                  gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(45, 45, -4182))) )

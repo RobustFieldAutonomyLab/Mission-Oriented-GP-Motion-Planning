@@ -1,3 +1,4 @@
+include_directories(include)
 add_library(OMPLPlanning include/OMPLObjective.h
         include/OMPLConstraint.h
         src/OMPLHelper.cpp)
@@ -15,11 +16,12 @@ target_link_libraries(testRRTstar PUBLIC
         gtsam
         matplot)
 
-add_executable(testKPiece src/KPiecePlanning.cpp)
-target_link_libraries(testKPiece PUBLIC
+add_executable(testPRM src/PRMPlanning.cpp)
+target_link_libraries(testPRM PUBLIC
         OMPLPlanning
         ompl
         ${Boost_LIBRARIES}
         gtsam
         matplot)
+
 

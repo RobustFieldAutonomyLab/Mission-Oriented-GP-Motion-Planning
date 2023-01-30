@@ -84,16 +84,17 @@ inline void plotEvidenceMap3D(gtsam::Matrix prob_grid,
         mesh(X, Y, Z);
     }
     else if (type == POINT){
-        std::vector<double> X, Y, Z;
+        std::vector<double> X, Y, Z, sizes;
 
         for (int i=0; i < grid_rows; i++){
             for (int j = 0; j < grid_cols; j++){
-                X.push_back(i);
-                Y.push_back(j);
+                X.push_back(j);
+                Y.push_back(i);
                 Z.push_back(prob_grid(i,j));
+                sizes.push_back(1);
             }
         }
-        scatter3(X, Y, Z);
+        scatter3(X, Y, Z, sizes);
     }
 
     hold(on);

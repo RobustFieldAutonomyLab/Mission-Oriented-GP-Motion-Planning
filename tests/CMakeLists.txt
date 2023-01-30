@@ -42,3 +42,12 @@ target_link_libraries(testNYC PUBLIC
         extern_gpmp2
         ${Boost_LIBRARIES}
         gtsam)
+
+add_executable(testASK Mobile3DAlaska.cpp)
+target_link_libraries(testASK PUBLIC
+        planning
+        matplot
+        Threads::Threads
+        extern_gpmp2
+        ${Boost_LIBRARIES}
+        gtsam)

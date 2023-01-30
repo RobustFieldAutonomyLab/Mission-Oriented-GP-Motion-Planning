@@ -6,7 +6,7 @@ int main(int /*argc*/, char ** /*argv*/)
     std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
 
     OMPLParam params;
-    params.method_ = LBKPiece;
+    params.method_ = PRM;
     params.cell_size_ = 1;
     params.cell_size_z_ = 1;
     params.origin_ = gtsam::Point3(0, 0, -4243);
@@ -18,7 +18,7 @@ int main(int /*argc*/, char ** /*argv*/)
 
     params.w_sdf_ = 1;
 
-    OMPLHelper env("../data/depth_grid2.csv", params);
+    OMPLHelper env("../../../data/depth_grid2.csv", params);
 
     if (env.plan(gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(5, 5, -4220)),
                  gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(45, 45, -4182))) )

@@ -23,6 +23,7 @@
 
 #include "Planning.h"
 #include "SignedDistanceField.h"
+#include <gtsam/nonlinear/ISAM2.h>
 
 
 using namespace gtsam;

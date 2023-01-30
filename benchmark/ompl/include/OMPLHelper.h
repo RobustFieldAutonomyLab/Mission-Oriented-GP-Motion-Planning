@@ -4,6 +4,7 @@
 #include <ompl/geometric/planners/rrt/RRTstar.h>
 #include <ompl/geometric/planners/kpiece/KPIECE1.h>
 #include <ompl/geometric/planners/kpiece/LBKPIECE1.h>
+#include <ompl/geometric/planners/prm/PRMstar.h>
 #include <ompl/geometric/GeneticSearch.h>
 
 
@@ -23,7 +24,7 @@
 #include "../include/SignedDistanceField.h"
 
 
-enum OMPLMethod{RRTStar, LBKPiece, GeneticAlgorithm};
+enum OMPLMethod{RRTStar, LBKPiece, PRM};
 
 struct OMPLParam{
     OMPLMethod method_;
