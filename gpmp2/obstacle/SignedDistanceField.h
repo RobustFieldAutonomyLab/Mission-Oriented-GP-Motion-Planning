@@ -99,7 +99,7 @@ public:
     const gtsam::Vector3 g_idx = gradient(pidx);
     // convert gradient of index to gradient of metric unit
     g = gtsam::Vector3(g_idx(1)/cell_size_, g_idx(0)/cell_size_, g_idx(2)/cell_size_z_);
-//      g = gtsam::Vector3(g_idx(1), g_idx(0), g_idx(2))/cell_size_z_;
+//      g = gtsam::Vector3(g_idx(1), g_idx(0), g_idx(2));
     return signed_distance(pidx);
   }
 

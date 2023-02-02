@@ -53,7 +53,7 @@ void run_small(Matrix seafloor_map){
 
     param.seafloor_mission = true;
     param.seafloor_cost_sigma = 1;
-    param.seafloor_dist = 2;
+    param.seafloor_dist = 1.2;
 
     param.check_inter = 10;//
 
@@ -62,7 +62,7 @@ void run_small(Matrix seafloor_map){
     Planning3DUUV p3d(param);
     seafloor_map = p3d.buildMap(1,1,Point3(0,0,-35),seafloor_map);
     auto result = p3d.optimize(ps, vs, delta_t);
-    vector<double> X, Y, Z, X_floor, Z_floor;
+    vector<double> X, Y, Z;
     for (auto pose : result){
         X.push_back(pose.x());
         Y.push_back(pose.y());
@@ -75,7 +75,7 @@ void run_small(Matrix seafloor_map){
 //    vector<double> sx, sy, sz;
 //    auto l2 = matplot::plot3(sx, sy, sz, "r*");
     matplot::show();
-//    draw(X, Y, Z, seafloor_map);
+    savePath(X, Y, Z, "../../data/NYC1.txt");
 }
 
 void run_big(Matrix seafloor_map, string sdf_path){
@@ -156,8 +156,8 @@ void run_big(Matrix seafloor_map, string sdf_path){
 }
 
 int main(){
-//    Matrix data = loadSeaFloorData("../../data/NYC/depth_grid_NYC_small.csv");
-    Matrix data = loadSeaFloorData("../../data/NYC/depth_grid_NYC.csv");
-    run_big(data, "../../data/NYC/sdfNYC10.txt");
-//    run_small(data);
+    Matrix data = loadSeaFloorData("../../data/NYC/depth_grid_NYC_small.csv");
+//    Matrix data = loadSeaFloorData("../../data/NYC/depth_grid_NYC.csv");
+//    run_big(data, "../../data/NYC/sdfNYC10.txt");
+    run_small(data);
 }

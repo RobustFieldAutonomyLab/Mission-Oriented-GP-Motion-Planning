@@ -39,7 +39,7 @@ inline void plotEvidenceMap2D(gtsam::Matrix prob_grid, double origin_x, double o
         C.push_back(C_tmp);
     }
 
-    image(origin_x, grid_corner_x, origin_y, grid_corner_y,C);
+    auto im = image(origin_x, grid_corner_x, origin_y, grid_corner_y,C);
     hold(on);
 }
 
@@ -55,13 +55,14 @@ inline void plotEvidenceMap3D(gtsam::Matrix prob_grid,
     double grid_corner_y = origin_y + (grid_rows - 1) * cell_size;
     std::vector<std::vector<double>> Z;
 
+    int cut_x = 35;
     if (type == MESH){
         auto [X, Y] =
-                meshgrid(iota(origin_x, cell_size, grid_corner_x),
+                meshgrid(iota(origin_x+cut_x, cell_size, grid_corner_x),
                                iota(origin_y, cell_size, grid_corner_y));
         for (int i=0; i < grid_rows; i++){
             std::vector<double> this_line_Z;
-            for (int j = 0; j < grid_cols; j++){
+            for (int j = cut_x; j < grid_cols; j++){
                 this_line_Z.push_back(prob_grid(i,j));
             }
             Z.push_back(this_line_Z);
@@ -118,25 +119,13 @@ inline gtsam::Matrix loadSeaFloorData(std::string file_name){
 
 }
 
-inline void draw(std::vector<double> X, std::vector<double> Y, std::vector<double> Z, gtsam::Matrix seafloor_map){
-    matplot::save("1.png");
-    matplot::cla();
-    plotEvidenceMap2D(seafloor_map, 1, 1, 100);
-    matplot::hold(matplot::on);
-    matplot::plot(X,Y,"-or");
-    matplot::arrow(X[0]+3, Y[0]+3, X[0], Y[0]);
-    matplot::xlabel("x");
-    matplot::ylabel("y");
-    matplot::save("XY.png");
-
-    matplot::cla();
-    matplot::plot(X,Z, "-or");
-    matplot::xlabel("x");
-    matplot::ylabel("z");
-    matplot::hold(matplot::on);
-    matplot::arrow(X[0]+3, Z[0]+3, X[0], Z[0]);
-
-    matplot::save("XZ.png");
+inline void savePath(std::vector<double> X, std::vector<double> Y, std::vector<double> Z, string filename){
+    std::fstream file;
+    file.open(filename, std::ios::out);
+    for (int i = 0; i < X.size(); i++){
+        file << X[i]<<", "<<Y[i]<<", "<<Z[i]<<endl;
+    }
+    file.close();
 }
 
 inline std::vector<gtsam::Matrix> loadCurrentData(std::string file_name){
