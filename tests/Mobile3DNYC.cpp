@@ -6,13 +6,13 @@ using namespace std;
 void run_small(Matrix seafloor_map){
     double delta_t = 0.4;
     int total_time_step = 300;
-    Pose3 start_pose = Pose3(Rot3(),Point3(40,10,  -5));
+    Pose3 start_pose = Pose3(Rot3(),Point3(40,10,  -15));
     Vector start_vel;
     Vector6 start_vel6;
     start_vel6 << Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0);
     start_vel = start_vel6;
 
-    Pose3 end_pose = Pose3(Rot3(), Point3(60, 100, -5));
+    Pose3 end_pose = Pose3(Rot3(), Point3(50, 100, -10));
     Vector end_vel;
     Vector6 end_vel6;
     end_vel6 << Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0);
@@ -51,7 +51,7 @@ void run_small(Matrix seafloor_map){
 
     param.vehicle_size = 1;
 
-    param.seafloor_mission = true;
+    param.seafloor_mission = false;
     param.seafloor_cost_sigma = 1;
     param.seafloor_dist = 1.2;
 
@@ -81,7 +81,7 @@ void run_small(Matrix seafloor_map){
 void run_big(Matrix seafloor_map, string sdf_path){
     double delta_t = 0.4;
     int total_time_step = 500;
-    Pose3 start_pose = Pose3(Rot3(),Point3(400,100,  -5));
+    Pose3 start_pose = Pose3(Rot3(),Point3(400,100, -5));
     Vector start_vel;
     Vector6 start_vel6;
     start_vel6 << Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0);
@@ -126,7 +126,7 @@ void run_big(Matrix seafloor_map, string sdf_path){
 
     param.vehicle_size = 1;
 
-    param.seafloor_mission = true;
+    param.seafloor_mission = false;
     param.seafloor_cost_sigma = 1;
     param.seafloor_dist = 2;
 
