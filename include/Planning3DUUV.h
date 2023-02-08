@@ -58,10 +58,10 @@ struct Planning3DUUVParameter{
 class Planning3DUUV : public Planning<Pose3MobileBaseModel, SignedDistanceField>{
 public:
     explicit Planning3DUUV(Planning3DUUVParameter param);
-    Matrix buildMap(double cell_size, double cell_size_z, Point3 origin, Matrix seafloor_map);
+    Matrix buildMap(double cell_size, double cell_size_z, Point3 origin, Matrix seafloor_map, double sea_level = 0);
     Matrix buildMap(double cell_size, double cell_size_z,
                     Point3 origin, Matrix seafloor_map,
-                    string sdf_path);
+                    double sea_level, string sdf_path);
     std::vector<Pose3> optimize(vector<Pose3> poses,
                                  vector<Vector> vels,
                                  double delta_t);

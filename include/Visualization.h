@@ -55,7 +55,7 @@ inline void plotEvidenceMap3D(gtsam::Matrix prob_grid,
     double grid_corner_y = origin_y + (grid_rows - 1) * cell_size;
     std::vector<std::vector<double>> Z;
 
-    int cut_x = 35;
+    int cut_x = 0;
     if (type == MESH){
         auto [X, Y] =
                 meshgrid(iota(origin_x+cut_x, cell_size, grid_corner_x),
@@ -104,9 +104,12 @@ inline void plotEvidenceMap3D(gtsam::Matrix prob_grid,
 inline gtsam::Matrix loadSeaFloorData(std::string file_name){
     std::fstream depth_file;
     depth_file.open(file_name, std::ios::in);
+    double x_width_d, y_width_d;
     int x_width, y_width;
-    depth_file>>x_width;
-    depth_file>>y_width;
+    depth_file>>x_width_d;
+    depth_file>>y_width_d;
+    x_width = x_width_d;
+    y_width = y_width_d;
     gtsam::Matrix data(x_width, y_width);
     double tmp;
     for (int i=0; i<x_width; i++){
@@ -166,18 +169,19 @@ inline std::vector<double> loadDepthData(std::string file_name){
 }
 
 inline std::vector<gtsam::Matrix> loadSDFData(std::string file_name,
-                                  double cell_size, double cell_size_z, double origin_z){
+                                  double cell_size, double cell_size_z, double origin_z, double sea_level){
     std::fstream sdf_file;
     sdf_file.open(file_name, std::ios::in);
     int x_width, y_width, z_width;
     double x_width_d, y_width_d, z_width_d;
-    double r_cell_size, r_cell_size_z, r_origin_z;
+    double r_cell_size, r_cell_size_z, r_origin_z, r_sea_level;
     sdf_file>>z_width_d>>x_width_d>>y_width_d;
     x_width = int(x_width_d); y_width = int(y_width_d); z_width = int(z_width_d);
-    sdf_file>>r_cell_size>>r_cell_size_z>>r_origin_z;
+    sdf_file>>r_cell_size>>r_cell_size_z>>r_origin_z>>r_sea_level;
     if (r_cell_size != cell_size ||
             r_cell_size_z != cell_size_z ||
-                r_origin_z != origin_z){
+                r_origin_z != origin_z ||
+                    r_sea_level != sea_level){
         std::cout<<"Different cell size or origin for SDF data and motion planning!"<<std::endl;
         return std::vector<gtsam::Matrix>{};
     }

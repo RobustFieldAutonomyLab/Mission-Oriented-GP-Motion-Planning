@@ -51,7 +51,7 @@ void run_small(Matrix seafloor_map){
 
     param.vehicle_size = 1;
 
-    param.seafloor_mission = false;
+    param.seafloor_mission = true;
     param.seafloor_cost_sigma = 1;
     param.seafloor_dist = 1.2;
 
@@ -60,7 +60,7 @@ void run_small(Matrix seafloor_map){
     param.use_current = false;
 
     Planning3DUUV p3d(param);
-    seafloor_map = p3d.buildMap(1,1,Point3(0,0,-35),seafloor_map);
+    seafloor_map = p3d.buildMap(1,1,Point3(0,0,-35),seafloor_map, -6);
     auto result = p3d.optimize(ps, vs, delta_t);
     vector<double> X, Y, Z;
     for (auto pose : result){
@@ -80,14 +80,14 @@ void run_small(Matrix seafloor_map){
 
 void run_big(Matrix seafloor_map, string sdf_path){
     double delta_t = 0.4;
-    int total_time_step = 500;
-    Pose3 start_pose = Pose3(Rot3(),Point3(400,100, -5));
+    int total_time_step = 300;
+    Pose3 start_pose = Pose3(Rot3(),Point3(400,100, -15));
     Vector start_vel;
     Vector6 start_vel6;
     start_vel6 << Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0);
     start_vel = start_vel6;
 
-    Pose3 end_pose = Pose3(Rot3(), Point3(600, 1000, -5));
+    Pose3 end_pose = Pose3(Rot3(), Point3(500, 1000, -10));
     Vector end_vel;
     Vector6 end_vel6;
     end_vel6 << Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0);
@@ -126,9 +126,9 @@ void run_big(Matrix seafloor_map, string sdf_path){
 
     param.vehicle_size = 1;
 
-    param.seafloor_mission = false;
+    param.seafloor_mission = true;
     param.seafloor_cost_sigma = 1;
-    param.seafloor_dist = 2;
+    param.seafloor_dist = 1.2;
 
     param.check_inter = 10;//
 
@@ -138,7 +138,7 @@ void run_big(Matrix seafloor_map, string sdf_path){
     double cell_size = 1;
     double cell_size_z = 1;
     //TODO: edit here
-    seafloor_map = p3d.buildMap(cell_size,cell_size_z,Point3(0,0,-35),seafloor_map, sdf_path);
+    seafloor_map = p3d.buildMap(cell_size,cell_size_z,Point3(0,0,-35),seafloor_map, -6, sdf_path);
     auto result = p3d.optimize(ps, vs, delta_t);
     vector<double> X, Y, Z, X_floor, Z_floor;
     for (auto pose : result){

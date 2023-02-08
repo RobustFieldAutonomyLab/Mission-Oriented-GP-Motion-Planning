@@ -115,14 +115,17 @@ inline std::vector<Matrix> signedDistanceField3D(const std::vector<Matrix> &grou
     return field_3D;
 }
 
-inline gpmp2::SignedDistanceField* buildSDF(
-        double cell_size, double cell_size_z, Point3 origin, Matrix &seafloor_map) {
-    auto s_max = seafloor_map.maxCoeff();
+inline gpmp2::SignedDistanceField* buildSDF(double cell_size, double cell_size_z,
+                    Point3 origin, Matrix &seafloor_map, double sea_level = 0) {
     auto s_min = seafloor_map.minCoeff();
+    auto s_max = seafloor_map.maxCoeff();
     int rows = seafloor_map.rows();
     int cols = seafloor_map.cols();
 
-    int z_level = int( (s_max - s_min) / cell_size_z ) + 5;
+    double max_z = fmin(s_max, sea_level);
+    double min_z = fmin(s_min, origin.z());
+
+    int z_level = int( (max_z - min_z) / cell_size_z );
 
     static gpmp2::SignedDistanceField sdf(
             origin, cell_size, cell_size_z,
@@ -174,9 +177,9 @@ inline gpmp2::SignedDistanceField* buildSDF(
 }
 
 inline gpmp2::SignedDistanceField* loadSDF(
-        double cell_size, double cell_size_z, Point3 origin, Matrix &seafloor_map,
+        double cell_size, double cell_size_z, Point3 origin, Matrix &seafloor_map, double sea_level,
         std::string sdf_path) {
-    std::vector<Matrix> sdf_data = loadSDFData(sdf_path, cell_size, cell_size_z, origin.z());
+    std::vector<Matrix> sdf_data = loadSDFData(sdf_path, cell_size, cell_size_z, origin.z(), sea_level);
 
     static gpmp2::SignedDistanceField sdf(
             origin, cell_size, cell_size_z,

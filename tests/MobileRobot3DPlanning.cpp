@@ -5,7 +5,7 @@ using namespace std;
 
 void simplier(Matrix seafloor_map, vector<Matrix> grid_u, vector<Matrix> grid_v){
     double delta_t = 0.4;
-    int total_time_step = 150;
+    int total_time_step = 500;
     Pose3 start_pose = Pose3(Rot3(),Point3(5, 5, -4220));
     Vector start_vel;
     Vector6 start_vel6;
@@ -44,7 +44,7 @@ void simplier(Matrix seafloor_map, vector<Matrix> grid_u, vector<Matrix> grid_v)
     }
     Planning3DUUVParameter param;
     param.use_vehicle_dynamics = true;
-    param.dynamics_sigma = 0.01;
+    param.dynamics_sigma = 0.2;
 
     param.obstacle_epsilon_dist = 1;
 //    param.obstacle_epsilon_dist = 1;
@@ -52,7 +52,7 @@ void simplier(Matrix seafloor_map, vector<Matrix> grid_u, vector<Matrix> grid_v)
 
     param.vehicle_size = 1;
 
-    param.seafloor_mission = false;
+    param.seafloor_mission = true;
     param.seafloor_cost_sigma = 0.2;
     param.seafloor_dist = 1.2;//at least a little larger than obstacle dist
 //    param.seafloor_dist = 1.2;

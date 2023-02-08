@@ -21,16 +21,16 @@ Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
 
 }
 Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
-              Point3 origin, Matrix seafloor_map){
-    sdf = buildSDF(cell_size, cell_size_z, origin, seafloor_map);
+              Point3 origin, Matrix seafloor_map, double sea_level){
+    sdf = buildSDF(cell_size, cell_size_z, origin, seafloor_map, sea_level);
     sf = new Seafloor(origin, cell_size, seafloor_map);
     return seafloor_map;
 }
 
 Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
                                Point3 origin, Matrix seafloor_map,
-                               string sdf_path){
-    sdf = loadSDF(cell_size, cell_size_z, origin, seafloor_map, sdf_path);
+                               double sea_level, string sdf_path){
+    sdf = loadSDF(cell_size, cell_size_z, origin, seafloor_map, sea_level, sdf_path);
     sf = new Seafloor(origin, cell_size, seafloor_map);
     return seafloor_map;
 }

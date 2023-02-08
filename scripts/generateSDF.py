@@ -13,8 +13,8 @@ def main(argv):
     cell_size_z = 1
     floor_level = 0
 
-    options = "h:i:o:c:z:f:"
-    long_options = ["Help", "Input", "Output", "Cell_size", "Z_cell_size", "Seafloor_bottom_level"]
+    options = "h:i:o:c:z:f:l:"
+    long_options = ["Help", "Input", "Output", "Cell_size", "Z_cell_size", "Seafloor_bottom_level", "Sea_surface_level"]
 
     opts, args = getopt.getopt(argv, options, long_options)
     for opt, arg in opts:
@@ -31,11 +31,14 @@ def main(argv):
             cell_size_z = float(arg)
         elif opt in ("-f", "--Seafloor_bottom_level"):
             floor_level = float(arg)
+        elif opt in ("-l", "--Sea_surface_level"):
+            surface_level = float(arg)
+
 
     seafloor_map = readSeafloorMap(input_file)
-    field = grid23Dfield(seafloor_map, cell_size_z, floor_level)
+    field = grid23Dfield(seafloor_map, cell_size_z, floor_level, surface_level)
     sdf_data = signedDistanceField3D(field, cell_size)
-    saveSDF(sdf_data, output_file, cell_size, cell_size_z, floor_level)
+    saveSDF(sdf_data, output_file, cell_size, cell_size_z, floor_level, surface_level)
 
 def readSeafloorMap(seafloor_path):
     file = open(seafloor_path, "r")
@@ -50,11 +53,15 @@ def readSeafloorMap(seafloor_path):
     plt.savefig("maploaded.png")
     return seafloor_map
 
-def grid23Dfield(grid, cell_size_z, floor_level):
+def grid23Dfield(grid, cell_size_z, floor_level, surface_level):
     [rows, cols] = grid.shape
     g_max = np.max(grid)
     g_min = np.min(grid)
-    z_level = int((g_max - g_min) / float(cell_size_z) + 0.5) + 5
+
+    z_max = min(g_max, surface_level)
+    z_min = min(g_min, floor_level)
+
+    z_level = int((z_max - z_min) / float(cell_size_z) + 0.5)
     field = np.zeros((z_level, rows, cols))
     for z in range(0, z_level):
         for i in range(0, rows):
@@ -102,10 +109,10 @@ def signedDistanceField3D(ground_truth_map, cell_size):
 
     return field
 
-def saveSDF(field, path, cell_size, cell_size_z, floor_level):
+def saveSDF(field, path, cell_size, cell_size_z, floor_level, surface_level):
     [z, x, y] = field.shape
     data = field.flatten()
-    data = np.insert(data, 0, [z,x,y,cell_size, cell_size_z, floor_level], axis=0)
+    data = np.insert(data, 0, [z,x,y,cell_size, cell_size_z, floor_level, surface_level], axis=0)
     np.savetxt(path, data)
     print("Success!")
 
