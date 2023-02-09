@@ -52,6 +52,7 @@ struct Planning3DUUVParameter{
     //Water current
     bool use_current = false;
 
+    int max_iter = 1000;
 };
 
 
@@ -64,9 +65,12 @@ public:
                     double sea_level, string sdf_path);
     std::vector<Pose3> optimize(vector<Pose3> poses,
                                  vector<Vector> vels,
-                                 double delta_t);
+                                 double delta_t,
+                                 string file_path);
     void buildCurrentGrid(double cell_size, double cell_size_z, Point3 origin,
                           vector<Matrix> grid_u, vector<Matrix> grid_v);
+
+    void savePath(string file, Values v, double error);
 
 private:
     typedef Planning<Pose3MobileBaseModel, SignedDistanceField> Base;
@@ -81,6 +85,9 @@ private:
 
     WaterCurrentGrid *wcg;
     bool _use_current;
+
+    int _max_iter;
+    int _total_time_step;
 
 };
 

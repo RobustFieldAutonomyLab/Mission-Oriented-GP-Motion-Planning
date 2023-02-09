@@ -122,15 +122,6 @@ inline gtsam::Matrix loadSeaFloorData(std::string file_name){
 
 }
 
-inline void savePath(std::vector<double> X, std::vector<double> Y, std::vector<double> Z, string filename){
-    std::fstream file;
-    file.open(filename, std::ios::out);
-    for (int i = 0; i < X.size(); i++){
-        file << X[i]<<", "<<Y[i]<<", "<<Z[i]<<endl;
-    }
-    file.close();
-}
-
 inline std::vector<gtsam::Matrix> loadCurrentData(std::string file_name){
     std::fstream depth_file;
     depth_file.open(file_name, std::ios::in);

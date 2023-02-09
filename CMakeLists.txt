@@ -20,6 +20,9 @@ include_directories(${OMPL_INCLUDE_DIR})
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+find_package(yaml-cpp REQUIRED)
+include_directories(${YAML_CPP_INCLUDE_DIRS})
+
 add_subdirectory(third_party/matplotplusplus)
 include_directories(third_party/matplotplusplus/source)
 

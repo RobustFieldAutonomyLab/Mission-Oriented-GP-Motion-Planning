@@ -4,6 +4,7 @@ Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
         _use_vehicle_dynamics(param.use_vehicle_dynamics), _dynamics_sigma(param.dynamics_sigma),
         _seafloor_mission(param.seafloor_mission), _seafloor_dist(param.seafloor_dist),
         _seafloor_cost_sigma(param.seafloor_cost_sigma), _use_current(param.use_current),
+        _max_iter(param.max_iter),
         Base(6, param.check_inter,
              param.obstacle_cost_sigma,
              param.obstacle_epsilon_dist){
@@ -16,9 +17,6 @@ Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
     Pose3MobileBase abs_robot;
 
     robot = new Pose3MobileBaseModel(abs_robot, sphere_vec);
-
-
-
 }
 Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
               Point3 origin, Matrix seafloor_map, double sea_level){
@@ -47,12 +45,13 @@ void Planning3DUUV::buildCurrentGrid(double cell_size, double cell_size_z, Point
 
 std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
                             vector<Vector> vels,
-                            double delta_t){
+                            double delta_t,
+                            string file_path){
     NonlinearFactorGraph graph;
 
-    int total_time_step = poses.size() - 1;
-    double total_time_sec = delta_t * total_time_step;
-    int total_check_step = (_check_inter + 1)* total_time_step;
+    _total_time_step = poses.size() - 1;
+    double total_time_sec = delta_t * _total_time_step;
+    int total_check_step = (_check_inter + 1)* _total_time_step;
 
     Key key_pos, key_vel, key_pos1, key_pos2, key_vel1, key_vel2;
 
@@ -60,7 +59,7 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
 
     Values init_values;
 
-    for(int i = 0; i <= total_time_step; i++){
+    for(int i = 0; i <= _total_time_step; i++){
         key_pos = Symbol('x', i);
         key_vel = Symbol('v', i);
 
@@ -68,16 +67,16 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
         init_values.insert(key_vel, vels[i]);
     }
 
-    for(int i = 0; i <= total_time_step; i++){
+    for(int i = 0; i <= _total_time_step; i++){
         key_pos = Symbol('x', i);
         key_vel = Symbol('v', i);
         if(i == 0) {
             graph.add(PriorFactor<Pose3>(key_pos, poses[0], pose_fix));
             graph.add(PriorFactor<Vector>(key_vel, vels[0], vel_fix));
         }
-        else if(i == total_time_step){
-            graph.add(PriorFactor<Pose3>(key_pos, poses[total_time_step], pose_fix));
-            graph.add(PriorFactor<Vector>(key_vel, vels[total_time_step], vel_fix));
+        else if(i == _total_time_step){
+            graph.add(PriorFactor<Pose3>(key_pos, poses[_total_time_step], pose_fix));
+            graph.add(PriorFactor<Vector>(key_vel, vels[_total_time_step], vel_fix));
         }
 
         if (_use_current && _use_vehicle_dynamics){
@@ -126,35 +125,37 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
         }
     }
 
-//    graph.print("\nFactor Graph:\n");
-//    init_values.print("\nInitial Values:\n");
-
-//    GaussNewtonParams parameters;
-    //parameters.relativeErrorTol = 1e-5;
-    //parameters.maxIterations = 100;
-//    graph.print();
     DoglegOptimizer optimizer(graph, init_values);
     DoglegParams params;
-    params.maxIterations = 10000;
+    params.maxIterations = _max_iter;
     Values result = optimizer.optimize();
-
-//    ISAM2Params parameters;
-//    ISAM2 isam(parameters);
-//    isam.update(graph, init_values);
-//    Values result = isam.calculateEstimate();
-
-    result.print("Final Result:\n");
-
-    std::vector<Pose3> out;
-    for (int i = 0; i <= total_time_step; i++ ){
+    vector <Pose3> p;
+    savePath(file_path, result, graph.error(result));
+    for (int i = 0; i <= _total_time_step; i++ ){
         Pose3 pose = result.at<Pose3>(Symbol('x', i));
-        Vector vel = result.at<Vector>(Symbol('v', i));
+        p.push_back(pose);
+    }
+    return p;
+}
+
+void Planning3DUUV::savePath(string filename, Values v, double error){
+    std::fstream file;
+    file.open(filename, std::ios::out);
+
+    v.print("Final Result:\n");
+    file <<"total error: "<< error <<endl;
+    file <<"x, y, z, roll, pitch, yaw, dx, dy, dz, droll, dpitch, dyaw"<<endl;
+    for (int i = 0; i <= _total_time_step; i++ ){
+        Pose3 pose = v.at<Pose3>(Symbol('x', i));
+        Vector vel = v.at<Vector>(Symbol('v', i));
         if(_use_current){
             vel = wcg->getVehicleVelocityWithoutCurrent(pose.translation(), vel);
             cout<< "Velocity " << i <<": "<< vel<<endl;
         }
-        out.push_back(pose);
+        file << pose.x()<<", "<<pose.y()<<", "<<pose.z()<<", "
+                << pose.rotation().roll()<<", "<<pose.rotation().pitch()<<", "<<pose.rotation().yaw()<<", "
+                << vel(3)<<", "<<vel(4)<<", "<<vel(5)<<", "
+                << vel(0)<<", "<<vel(1)<<", "<<vel(2)<< endl;
     }
-    return out;
-
+    file.close();
 }

@@ -25,29 +25,22 @@ target_link_libraries(testPoint3D PUBLIC
         ${Boost_LIBRARIES}
         gtsam)
 
-add_executable(testMobile3D MobileRobot3DPlanning.cpp)
+add_executable(testMobile3D Mobile3DPlanning.cpp)
 target_link_libraries(testMobile3D PUBLIC
         planning
         matplot
         Threads::Threads
         extern_gpmp2
+        ${YAML_CPP_LIBRARIES}
         ${Boost_LIBRARIES}
         gtsam)
 
-add_executable(testNYC Mobile3DNYC.cpp)
-target_link_libraries(testNYC PUBLIC
-        planning
-        matplot
-        Threads::Threads
-        extern_gpmp2
-        ${Boost_LIBRARIES}
-        gtsam)
 
-add_executable(testASK Mobile3DAlaska.cpp)
-target_link_libraries(testASK PUBLIC
-        planning
-        matplot
-        Threads::Threads
-        extern_gpmp2
-        ${Boost_LIBRARIES}
-        gtsam)
+#add_executable(testASK Mobile3DAlaska.cpp)
+#target_link_libraries(testASK PUBLIC
+#        planning
+#        matplot
+#        Threads::Threads
+#        extern_gpmp2
+#        ${Boost_LIBRARIES}
+#        gtsam)
