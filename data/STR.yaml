@@ -1,0 +1,50 @@
+trajectory:
+  delta_t: 0.4
+  total_time_step: 100
+  start_position: [5, 5, -4220]
+  start_rotation: [0, 0, 0]
+  start_velocity: [0, 0, 0]
+  start_angular_velocity: [0, 0, 0]
+
+  end_position: [45, 45, -4182]
+  end_rotation: [0, 0, 0]
+  end_velocity: [0, 0, 0]
+  end_angular_velocity: [0, 0, 0]
+
+planner:
+  vehicle_size: 1
+  check_inter: 10
+  max_iter: 1000
+
+  dynamics:
+    use_vehicle_dynamics: true
+    sigma: 0.2
+  obstacle:
+    epsilon_dist: 1
+    cost_sigma: 0.2
+  seafloor:
+    seafloor_mission: true
+    epsilon_dist: 1.2
+    cost_sigma: 0.2
+
+  current:
+    use_current: true
+    cell_size: 1
+    cell_size_z: 1000
+    origin: [0, 0, -5000]
+
+map:
+  origin: [0, 0, -4243]
+  sea_level: 0
+  cell_size: 1
+  cell_size_z: 1
+
+path:
+  load_sdf: false
+  seafloor_path: "../../data/str/depth_grid2.csv"
+  sdf_path:
+  out_path: "../../data/result.txt"
+  current_u_path: "../../data/str/u_mean.csv"
+  current_v_path: "../../data/str/v_mean.csv"
+
+visualize: true

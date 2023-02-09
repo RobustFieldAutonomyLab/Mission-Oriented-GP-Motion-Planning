@@ -169,6 +169,6 @@ void run(string yaml_path){
     }
 }
 
-int main(){
-    run("../../data/STR.yaml");
+int main(int argc, char *argv[]){
+    run(argv[1] );
 }
