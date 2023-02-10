@@ -31,5 +31,13 @@ make
 sudo make install
 ```
 
+- [edt](https://github.com/seung-lab/euclidean-distance-transform-3d)
+```bash
+git clone https://github.com/seung-lab/euclidean-distance-transform-3d.git
+mkdir UUVPlanning/third_party/edt
+cp euclidean-distance-transform-3d/cpp/edt.hpp UUVPlanning/third_party/edt
+
+```
+
 # GPMP 
 The GP Motion Planning code in GPMP2 doc is developed based on [GPMP2](https://github.com/borglab/gpmp2.git).
