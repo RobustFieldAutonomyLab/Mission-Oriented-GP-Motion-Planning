@@ -36,6 +36,7 @@ sudo make install
 git clone https://github.com/seung-lab/euclidean-distance-transform-3d.git
 mkdir UUVPlanning/third_party/edt
 cp euclidean-distance-transform-3d/cpp/edt.hpp UUVPlanning/third_party/edt
+cp euclidean-distance-transform-3d/cpp/threadpool.h UUVPlanning/third_party/edt
 
 ```
 
