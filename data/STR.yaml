@@ -47,4 +47,6 @@ path:
   current_u_path: "../../data/str/u_mean.csv"
   current_v_path: "../../data/str/v_mean.csv"
 
-visualize: true
+visualization:
+  visualize: true
+  downsize_mesh: false

@@ -86,7 +86,7 @@ void run(string yaml_path){
     auto planner = config["planner"];
     auto map = config["map"];
     auto path = config["path"];
-    auto visualize = config["visualize"].as<bool>();
+    auto visualize = config["visualization"];
 
     Planning3DUUV p3d(readParamYAML(planner));
 
@@ -154,10 +154,10 @@ void run(string yaml_path){
         Y.push_back(pose.y());
         Z.push_back(pose.z());
     }
-    if (visualize){
+    if (visualize["visualize"].as<bool>()){
         Vector3 ori = map["origin"].as<Vector3>();
         PLOT_TYPE tp;
-        if(path["load_sdf"].as<bool>())
+        if(visualize["downsize_mesh"].as<bool>())
             tp = DOWNSIZE_MESH;
         else
             tp = MESH;

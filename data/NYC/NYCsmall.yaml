@@ -42,4 +42,6 @@ path:
   sdf_path:
   out_path: "../../data/result.txt"
 
-visualize: false
+visualization:
+  visualize: true
+  downsize_mesh: false
