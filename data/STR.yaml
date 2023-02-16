@@ -35,7 +35,7 @@ planner:
 
 map:
   origin: [0, 0, -4243]
-  sea_level: 0
+  sea_level: -4180
   cell_size: 1
   cell_size_z: 1
 
