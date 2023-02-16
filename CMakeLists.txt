@@ -4,7 +4,7 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_INIT} -std=c++11 -fPIC")
 
-set (USE_BENCHMARK OFF)
+set (USE_BENCHMARK ON)
 
 # Find GTSAM components
 find_package(GTSAM REQUIRED) # Uses installed package
@@ -40,5 +40,5 @@ add_subdirectory(tests)
 
 if(${USE_BENCHMARK})
     add_subdirectory(benchmark/ompl)
-    add_subdirectory(benchmark/GA)
+    add_subdirectory(benchmark/stomp)
 endif()

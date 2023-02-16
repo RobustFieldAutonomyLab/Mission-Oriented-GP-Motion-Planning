@@ -122,7 +122,7 @@ inline gpmp2::SignedDistanceField* buildSDF(double cell_size, double cell_size_z
     int rows = seafloor_map.rows();
     int cols = seafloor_map.cols();
 
-    double max_z = fmax(s_max, sea_level);
+    double max_z = sea_level;
     double min_z = fmin(s_min, origin.z());
 
     int z_level = int( (max_z - min_z) / cell_size_z );
