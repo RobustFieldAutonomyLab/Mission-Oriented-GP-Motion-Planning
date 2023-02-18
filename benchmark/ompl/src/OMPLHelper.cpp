@@ -24,44 +24,46 @@ ob::OptimizationObjectivePtr multiObjective(const ob::SpaceInformationPtr& si,
     return ob::OptimizationObjectivePtr(opt);
 }
 
-OMPLHelper::OMPLHelper(const char *file_name, OMPLParam params):
-    vehicle_size_(params.vehicle_size_), origin_(params.origin_),
-        cell_size_(params.cell_size_), method_(params.method_),
-        dist_sdf_(params.dist_sdf_), dist_sf_(params.dist_sf_){
+OMPLHelper::OMPLHelper(const std::string& file_name, OMPLParameter params):
+    vehicle_size_(params.vehicle_size), origin_(params.origin),
+        cell_size_(params.cell_size), method_(params.method), max_time_(params.max_time),
+        dist_sdf_(params.dist_sdf), dist_sf_(params.dist_sf){
     bool ok = false;
     double s_max, s_min;
     try
     {
-        gtsam::Matrix data = loadSeaFloorData(file_name);
-        sf_ = new gpmp2::Seafloor(params.origin_, params.cell_size_, data);
-        sdf_ = buildSDF(cell_size_, params.cell_size_z_, origin_, data);
+        gtsam::Matrix data = loadSeaFloorData("../" + file_name);
+        sf_ = new gpmp2::Seafloor(params.origin, params.cell_size, data);
+        sdf_ = buildSDF(cell_size_, params.cell_size_z, origin_, data, params.sea_level);
         s_max = data.maxCoeff();
         s_min = data.minCoeff();
         ok = true;
     }
     catch (ompl::Exception &ex)
     {
-        OMPL_ERROR("Unable to load %s.\n%s", file_name, ex.what());
+        OMPL_ERROR("Unable to load %s.\n%s", &file_name, ex.what());
     }
     if (ok)
     {
 //        auto space(std::make_shared<ob::RealVectorStateSpace>());
         auto space(std::make_shared<ob::SE3StateSpace>());
 
-        double maxX = params.origin_.x() + sf_->getColScale() * params.cell_size_;
-        double maxY = params.origin_.y() + sf_->getRowScale() * params.cell_size_;
-        double maxZ = params.origin_.z() + int( (s_max - s_min) / params.cell_size_z_ ) + 5;
+        double maxX = params.origin.x() + sf_->getColScale() * params.cell_size;
+        double maxY = params.origin.y() + sf_->getRowScale() * params.cell_size;
+        double maxZ = params.origin.z() +
+                int(fmin(s_max, params.sea_level)
+                - fmin(s_min, params.origin.z())) ;
 
         corner_ = gtsam::Point3(maxX, maxY, maxZ);
 
         ob::RealVectorBounds bounds(3);
-        bounds.setLow(0,params.origin_.x());
+        bounds.setLow(0,params.origin.x());
         bounds.setHigh(0,maxX);
 
-        bounds.setLow(1,params.origin_.y());
+        bounds.setLow(1,params.origin.y());
         bounds.setHigh(1,maxY);
 
-        bounds.setLow(2,params.origin_.z());
+        bounds.setLow(2,params.origin.z());
         bounds.setHigh(2,maxZ);
         space->setBounds(bounds);
 
@@ -72,20 +74,12 @@ OMPLHelper::OMPLHelper(const char *file_name, OMPLParam params):
 //        space->setup();
 //        ss_->getSpaceInformation()->setStateValidityCheckingResolution(0.01);
 
+        // set optimization objective
         ss_->setOptimizationObjective(multiObjective(ss_->getSpaceInformation(), *sf_, dist_sf_,
-                             *sdf_, dist_sdf_, params.cost_thres_, params.w_vd_, params.w_sdf_, params.w_sf_));
+                             *sdf_, dist_sdf_, params.cost_threshold, params.w_vd, params.w_sdf, params.w_sf));
 
-        if(method_ == RRTStar)
+        if(method_ == "RRTStar")
             ss_->setPlanner(std::make_shared<og::RRTstar>(ss_->getSpaceInformation()));
-        else if(method_ == LBKPiece){
-            ob::PlannerPtr planner = std::make_shared<og::KPIECE1>(ss_->getSpaceInformation());
-            ss_->setPlanner(planner);
-        }
-        else if(method_ == PRM){
-            ob::PlannerPtr planner = std::make_shared<og::PRMstar>(ss_->getSpaceInformation());
-            ss_->setPlanner(planner);
-        }
-
     }
 }
 
@@ -108,7 +102,7 @@ bool OMPLHelper::plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt){
     goal->rotation().setAxisAngle(rot_g(0), rot_g(1),rot_g(2), rot_g(3));
     ss_->setStartAndGoalStates(start, goal);
     // generate a few solutions; all will be added to the goal;
-    ss_->solve(10);
+    ss_->solve(max_time_);
 
     const std::size_t ns = ss_->getProblemDefinition()->getSolutionCount();
     OMPL_INFORM("Found %d solutions", (int)ns);
@@ -126,12 +120,12 @@ bool OMPLHelper::plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt){
     return false;
 }
 
-void OMPLHelper::recordSolution()
+void OMPLHelper::recordSolution(PLOT_TYPE tp, std::string file_name)
 {
     if (!ss_ || !ss_->haveSolutionPath())
         return;
 
-    plotEvidenceMap3D(sf_->getData(),0,0,1,MESH);
+    plotEvidenceMap3D(sf_->getData(),origin_.x(),origin_.y(),cell_size_,MESH);
 
     matplot::hold(matplot::on);
 
@@ -139,7 +133,7 @@ void OMPLHelper::recordSolution()
     p.interpolate();
     std::vector<double> opt_x, opt_y, opt_z;
     std::ofstream file;
-    file.open ("result.txt");
+    file.open (file_name);
     for (std::size_t i = 0; i < p.getStateCount(); ++i)
     {
         opt_x.push_back(p.getState(i)->as<ob::SE3StateSpace::StateType>()->getX());

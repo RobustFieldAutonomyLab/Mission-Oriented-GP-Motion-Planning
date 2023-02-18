@@ -1,28 +1,41 @@
 #include "OMPLHelper.h"
+#include "../include/YAMLReader.h"
 
 
-int main(int /*argc*/, char ** /*argv*/)
+int main(int argc/*argc*/, char *argv[] /*argv*/)
 {
     std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
 
-    OMPLParam params;
-    params.method_ = RRTStar;
-    params.cell_size_ = 1;
-    params.cell_size_z_ = 1;
-    params.origin_ = gtsam::Point3(0, 0, -4243);
-    params.dist_sdf_ = 3;
-    params.dist_sf_ = 5;
-    params.w_vd_ = 1;
-    params.w_sf_ = 1;
-    params.w_sdf_ = 1;
-    params.cost_thres_ = 100;
+    YAML::Node config = YAML::LoadFile(argv[1]);
+    OMPLParameter params = readOMPLParamYAML(config);
 
-    OMPLHelper env("../../../data/depth_grid2.csv", params);
+    auto path = config["path"];
+    auto traj = config["trajectory"];
+    auto visualize = config["visualization"];
+    OMPLHelper env(path["seafloor_path"].as<string>(), params);
 
-    if (env.plan(gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(5, 5, -4220)),
-                 gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(45, 45, -4182))) )
+    auto s_rot = traj["start_rotation"].as<Vector3>();
+    auto s_pos = traj["start_position"].as<Vector3>();
+
+    auto e_rot = traj["end_rotation"].as<Vector3>();
+    auto e_pos = traj["end_position"].as<Vector3>();
+
+    Pose3 start_pose = Pose3(Rot3::RzRyRx(s_rot[2], s_rot[1], s_rot[0]),
+                             Point3(s_pos[0], s_pos[1], s_pos[2]));
+
+    Pose3 end_pose = Pose3(Rot3::RzRyRx(e_rot[2], e_rot[1], e_rot[0]),
+                           Point3(e_pos[0], e_pos[1], e_pos[2]));
+
+    if (env.plan(start_pose, end_pose) )
     {
-        env.recordSolution();
+        if (visualize["visualize"].as<bool>()){
+            PLOT_TYPE tp;
+            if (visualize["downsize_mesh"].as<bool>())
+                tp = DOWNSIZE_MESH;
+            else
+                tp = MESH;
+        env.recordSolution(tp, "result.txt");
+        }
     }
 
     return 0;

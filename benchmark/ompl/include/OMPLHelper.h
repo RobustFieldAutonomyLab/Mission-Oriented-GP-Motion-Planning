@@ -24,44 +24,46 @@
 #include "../include/SignedDistanceField.h"
 
 
-enum OMPLMethod{RRTStar, LBKPiece, PRM};
+//enum OMPLMethod{RRTStar, LBKPiece, PRM};
 
-struct OMPLParam{
-    OMPLMethod method_;
+struct OMPLParameter{
+    std::string method;
+    double vehicle_size;
 
-    gtsam::Point3 origin_;
-    double cell_size_;
-    double cell_size_z_;
+    double dist_sdf;
+    double w_sdf;
 
-    double vehicle_size_;
-    double dist_sdf_;
-    double dist_sf_;
+    bool seafloor_mission;
+    double dist_sf;
+    double w_sf;
+    double sea_level;
 
-    double w_sf_;
-    double w_sdf_;
-    double w_vd_;
+    double w_vd;
 
-    double cost_thres_;
+    gtsam::Point3 origin;
+    double cell_size;
+    double cell_size_z;
 
-    bool dynamic_constraint;
-
+    double cost_threshold;
+    double max_time;
 };
 
 class OMPLHelper
 {
 public:
-    OMPLHelper(const char *ppm_file, OMPLParam params);
+    OMPLHelper(const std::string& ppm_file, OMPLParameter params);
 
     bool plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt);
 
-    void recordSolution();
+    void recordSolution(PLOT_TYPE tp, std::string file_name);
 
 private:
     bool isStateValid(const ompl::base::State *state) const;
 
     ompl::geometric::SimpleSetupPtr ss_;
 
-    OMPLMethod method_;
+    std::string method_;
+    double max_time_;
 
     gtsam::Point3 origin_, corner_;
 
