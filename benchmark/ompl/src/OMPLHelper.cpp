@@ -26,7 +26,8 @@ ob::OptimizationObjectivePtr multiObjective(const ob::SpaceInformationPtr& si,
 
 OMPLHelper::OMPLHelper(const std::string& file_name, OMPLParameter params):
     vehicle_size_(params.vehicle_size), origin_(params.origin),
-        cell_size_(params.cell_size), method_(params.method), max_time_(params.max_time),
+        cell_size_(params.cell_size), method_(params.method),
+        max_time_(params.max_time), sea_level_(params.sea_level),
         dist_sdf_(params.dist_sdf), dist_sf_(params.dist_sf){
     bool ok = false;
     double s_max, s_min;
@@ -125,7 +126,7 @@ void OMPLHelper::recordSolution(PLOT_TYPE tp, std::string file_name)
     if (!ss_ || !ss_->haveSolutionPath())
         return;
 
-    plotEvidenceMap3D(sf_->getData(),origin_.x(),origin_.y(),cell_size_,MESH);
+    plotEvidenceMap3D(sf_->getData(),origin_.x(),origin_.y(),cell_size_,tp);
 
     matplot::hold(matplot::on);
 
@@ -153,7 +154,7 @@ bool OMPLHelper::isStateValid(const ompl::base::State *state) const
     double z = state->as<ob::SE3StateSpace::StateType>()->getZ();
     if(x < origin_.x() || y < origin_.y() || z < origin_.z())
         return false;
-    if(x+cell_size_ > corner_.x() || y+cell_size_ > corner_.y() || z+cell_size_ > corner_.z())
+    if(x+cell_size_ > corner_.x() || y+cell_size_ > corner_.y() || z+cell_size_ > corner_.z() || z > sea_level_)
         return false;
 //    else
 //        return true;

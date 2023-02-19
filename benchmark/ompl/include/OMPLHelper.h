@@ -75,5 +75,6 @@ private:
 
     gpmp2::SignedDistanceField* sdf_;
     double dist_sdf_;
+    double sea_level_;
 
 };

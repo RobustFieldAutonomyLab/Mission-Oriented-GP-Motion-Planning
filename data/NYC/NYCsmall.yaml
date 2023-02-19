@@ -45,3 +45,8 @@ path:
 visualization:
   visualize: true
   downsize_mesh: false
+
+ompl:
+  method: "RRTStar"
+  max_planning_time: 10
+  cost_threshold: 1000
