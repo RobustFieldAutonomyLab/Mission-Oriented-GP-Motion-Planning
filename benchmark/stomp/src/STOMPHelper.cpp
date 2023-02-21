@@ -3,7 +3,8 @@
 STOMPHelper::STOMPHelper(const std::string& file_name,
                     const STOMPParameter& params)
         : vehicle_size_(params.vehicle_size), origin_(params.origin),
-        cell_size_(params.cell_size), dist_sdf_(params.dist_sdf)
+        cell_size_(params.cell_size), dist_sdf_(params.dist_sdf),
+        w_sdf_(params.w_sdf), dist_sf_(params.dist_sf), w_sf_(params.w_sf)
 {
     stomp::generateSmoothingMatrix(params.total_time_steps, params.delta_t, smoothing_M_);
     srand(time(0));
@@ -23,7 +24,6 @@ STOMPHelper::STOMPHelper(const std::string& file_name,
     std_dev_ = sd;
 }
 
-//TODO: Maybe we could modify something here to make it more efficient
 bool STOMPHelper::generateNoisyParameters(const Eigen::MatrixXd& parameters,
                              std::size_t start_timestep,
                              std::size_t num_timesteps,
@@ -58,7 +58,6 @@ bool STOMPHelper::computeCosts(const Eigen::MatrixXd& parameters,
     return computeNoisyCosts(parameters, start_timestep, num_timesteps, iteration_number, -1, costs, validity);
 }
 
-//TODO: Modify the error function to make it similiar to others
 bool STOMPHelper::computeNoisyCosts(const Eigen::MatrixXd& parameters,
                        std::size_t start_timestep,
                        std::size_t num_timesteps,
@@ -73,41 +72,47 @@ bool STOMPHelper::computeNoisyCosts(const Eigen::MatrixXd& parameters,
     for (std::size_t t = 0u; t < num_timesteps; t++)
     {
         gtsam::Point3 pt(parameters(0, t), parameters(1, t), parameters(2, t));
-        double err = 0;
+        double err = 0, err_sdf = 0, err_sf = 0;
         if(pt.x() < origin_.x() || pt.y() < origin_.y() || pt.z() < origin_.z()){
             validity = false;
+            err = 100;
         }
         else if(pt.x()+cell_size_ > corner_.x() ||
                 pt.y()+cell_size_ > corner_.y() ||
                         pt.z()+cell_size_ > corner_.z()){
             validity = false;
+            err = 100;
         }
         else{
             double dist_sdf = sdf_->getSignedDistance(pt);
             double dist = sf_->getDistance(pt);
 
-            if(dist_sdf > vehicle_size_ + dist_sdf_){
-                err = vehicle_size_ + dist_sdf_ - dist;
+            if(dist_sdf < vehicle_size_ + dist_sdf_){
+                err_sdf = vehicle_size_ + dist_sdf_ - dist;
             }
-            if(dist < 0){
+            if(dist < vehicle_size_){
                 validity = false;
+                err = dist;
+            }
+            else if(dist > dist_sf_){
+                err_sf = dist;
             }
 
-            costs(t) = err;
         }
+        err = abs(err) + w_sdf_ * abs(err_sdf) + w_sf_ * abs(err_sf);
+        costs(t) = err;
     }
     return true;
 }
 
-//TODO: Try to see any possibilities make it work with filter
 bool STOMPHelper::filterParameterUpdates(std::size_t start_timestep,
                             std::size_t num_timesteps,
                             int iteration_number,
                             const Eigen::MatrixXd& parameters,
                             Eigen::MatrixXd& updates)
 {
-//    return smoothParameterUpdates(start_timestep, num_timesteps, iteration_number, updates);
-    return true;
+    return smoothParameterUpdates(start_timestep, num_timesteps, iteration_number, updates);
+//    return true;
 }
 
 bool STOMPHelper::smoothParameterUpdates(std::size_t start_timestep,

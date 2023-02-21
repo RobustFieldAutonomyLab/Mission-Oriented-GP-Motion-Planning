@@ -135,12 +135,14 @@ void OMPLHelper::recordSolution(PLOT_TYPE tp, std::string file_name)
     std::vector<double> opt_x, opt_y, opt_z;
     std::ofstream file;
     file.open (file_name);
+    file << "error: "<<std::endl;
+    file << "x, y, z"<<std::endl;
     for (std::size_t i = 0; i < p.getStateCount(); ++i)
     {
         opt_x.push_back(p.getState(i)->as<ob::SE3StateSpace::StateType>()->getX());
         opt_y.push_back(p.getState(i)->as<ob::SE3StateSpace::StateType>()->getY());
         opt_z.push_back(p.getState(i)->as<ob::SE3StateSpace::StateType>()->getZ());
-        file << opt_x[i] << " "<< opt_y[i] << " " <<opt_z[i] << " " <<std::endl;
+        file << opt_x[i] << ", "<< opt_y[i] << ", " <<opt_z[i] << " " <<std::endl;
     }
     file.close();
     auto l = matplot::plot3(opt_x, opt_y, opt_z,"-ob");

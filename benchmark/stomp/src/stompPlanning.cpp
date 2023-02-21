@@ -8,6 +8,41 @@
  * @return A STOMP configuration object
  */
 
+inline STOMPParameter readSTOMPParamYAML(YAML::Node config){
+    STOMPParameter param;
+    auto planner = config["planner"];
+    param.vehicle_size = planner["vehicle_size"].as<double>();
+
+    auto obstacle = planner["obstacle"];
+    param.dist_sdf = obstacle["epsilon_dist"].as<double>();
+    param.w_sdf = obstacle["cost_sigma"].as<double>();
+
+    auto seafloor = planner["seafloor"];
+    if(seafloor["seafloor_mission"].as<bool>()){
+        param.dist_sf = seafloor["epsilon_dist"].as<double>();
+        param.w_sf = seafloor["cost_sigma"].as<double>();
+    }
+    else{
+        param.dist_sf = 0;
+        param.w_sf = 0;
+    }
+
+    auto map = config["map"];
+    param.origin = map["origin"].as<Vector3>();
+    param.cell_size = map["cell_size"].as<double>();
+    param.cell_size_z = map["cell_size_z"].as<double>();
+    param.sea_level = map["sea_level"].as<double>();
+
+    auto traj = config["trajectory"];
+    param.delta_t = traj["delta_t"].as<double>();
+    param.total_time_steps = traj["total_time_step"].as<int>();
+
+    auto stomp= config["stomp"];
+    param.std_dev = stomp["std_dev"].as<Vector3>();
+
+    return param;
+}
+
 void recordSolution(Trajectory traj, Matrix seafloor_map, Point3 origin, double cell_size, PLOT_TYPE tp, std::string file_name)
 {
     plotEvidenceMap3D(seafloor_map,origin.x(),origin.y(),cell_size,tp);

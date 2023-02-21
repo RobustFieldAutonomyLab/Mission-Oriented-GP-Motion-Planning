@@ -16,6 +16,9 @@ struct STOMPParameter{
     double dist_sdf;
     double w_sdf;
 
+    double dist_sf;
+    double w_sf;
+
     double delta_t;
     int total_time_steps;
 
@@ -75,9 +78,11 @@ protected:
 
     gpmp2::Seafloor* sf_;
     double dist_sf_;
+    double w_sf_;
 
     gpmp2::SignedDistanceField* sdf_;
     double dist_sdf_;
+    double w_sdf_;
 
 
 };

@@ -1,7 +1,5 @@
 #include "yaml-cpp/yaml.h"
 #include "Planning3DUUV.h"
-#include "../benchmark/ompl/include/OMPLHelper.h"
-#include "../benchmark/stomp/include/STOMPHelper.h"
 
 namespace YAML {
     template<>
@@ -47,66 +45,5 @@ inline Planning3DUUVParameter readParamYAML(YAML::Node planner){
 
     YAML::Node current = planner["current"];
     param.use_current = current["use_current"].as<bool>();
-    return param;
-}
-
-inline OMPLParameter readOMPLParamYAML(YAML::Node config){
-    OMPLParameter param;
-    auto planner = config["planner"];
-    param.vehicle_size = planner["vehicle_size"].as<double>();
-
-    YAML::Node dynamics = planner["dynamics"];
-    param.w_vd = dynamics["sigma"].as<double>();
-
-    YAML::Node obstacle = planner["obstacle"];
-    param.dist_sdf = obstacle["epsilon_dist"].as<double>();
-    param.w_sdf = obstacle["cost_sigma"].as<double>();
-
-    YAML::Node seafloor = planner["seafloor"];
-    param.seafloor_mission = seafloor["seafloor_mission"].as<bool>();
-    if (!param.seafloor_mission){
-        param.w_sf = 0;
-        param.dist_sf = 0;
-    }
-    else{
-        param.w_sf = seafloor["cost_sigma"].as<double>();
-        param.dist_sf = seafloor["epsilon_dist"].as<double>();
-    }
-
-    auto map = config["map"];
-    param.origin = map["origin"].as<Vector3>();
-    param.cell_size = map["cell_size"].as<double>();
-    param.cell_size_z = map["cell_size_z"].as<double>();
-    param.sea_level = map["sea_level"].as<double>();
-
-    YAML::Node ompl = config["ompl"];
-    param.method = ompl["method"].as<string>();
-    param.max_time = ompl["max_planning_time"].as<double>();
-    param.cost_threshold = ompl["cost_threshold"].as<double>();
-    return param;
-}
-
-inline STOMPParameter readSTOMPParamYAML(YAML::Node config){
-    STOMPParameter param;
-    auto planner = config["planner"];
-    param.vehicle_size = planner["vehicle_size"].as<double>();
-
-    YAML::Node obstacle = planner["obstacle"];
-    param.dist_sdf = obstacle["epsilon_dist"].as<double>();
-    param.w_sdf = obstacle["cost_sigma"].as<double>();
-
-    auto map = config["map"];
-    param.origin = map["origin"].as<Vector3>();
-    param.cell_size = map["cell_size"].as<double>();
-    param.cell_size_z = map["cell_size_z"].as<double>();
-    param.sea_level = map["sea_level"].as<double>();
-
-    auto traj = config["trajectory"];
-    param.delta_t = traj["delta_t"].as<double>();
-    param.total_time_steps = traj["total_time_step"].as<int>();
-
-    auto stomp= config["stomp"];
-    param.std_dev = stomp["std_dev"].as<Vector3>();
-
     return param;
 }
