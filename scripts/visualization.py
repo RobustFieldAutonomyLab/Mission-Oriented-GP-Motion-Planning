@@ -2,10 +2,12 @@ import pandas as pd
 import numpy as np
 from generateSDF import readSeafloorMap
 from matplotlib import pyplot as plt
+from scipy import interpolate
 
 path_fp = "../data/result.txt"
 
-seafloor_fp = "../data/lower_bay/depth_grid_lower_bay.csv"
+seafloor_fp = "../data/NYC/depth_grid_NYC.csv"
+cell_size = 10
 
 path_df = pd.read_csv(path_fp,skiprows=1)
 path = path_df.to_numpy()
@@ -15,12 +17,25 @@ z_max = max(seafloor_mat.flatten())
 z_min = min(seafloor_mat.flatten())
 
 [w,h] = seafloor_mat.shape
+w = w*cell_size
+h = h*cell_size
 [len,a] = path.shape
-id_x = path[:,0]
-id_x = id_x.astype(int)
-id_y = path[:,1]
-id_y = id_y.astype(int)
-z_floor = seafloor_mat[id_y, id_x]
+z_floor = np.zeros(len)
+
+for i,id in enumerate(path):
+    id_x = id[1]/cell_size
+    id_y = id[0]/cell_size
+
+    id_x_l = int(id_x)
+    id_x_r = int(id_x) + 1
+    id_y_l = int(id_y)
+    id_y_r = int(id_y) + 1
+    tmp_mat = np.array([[seafloor_mat[id_x_l, id_y_l], seafloor_mat[id_x_r, id_y_l]],
+                        [seafloor_mat[id_x_l, id_y_r], seafloor_mat[id_x_r, id_y_r]]])
+    xx, yy = np.meshgrid([id_x_l, id_x_r], [id_y_l, id_y_r])
+    f = interpolate.interp2d(xx, yy, tmp_mat, kind='linear')
+    z_floor[i] = f(id_x, id_y)
+
 fig, (ax1, ax2, ax3) = plt.subplots(3,figsize=(8, 6))
 fig.suptitle('Robot position(m) vs time(s)')
 ax1.plot(path[:,0], label = 'x', color = "#22559c")
