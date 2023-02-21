@@ -19,7 +19,8 @@ STOMPHelper::STOMPHelper(const std::string& file_name,
 
     corner_ = gtsam::Point3(maxX, maxY, maxZ);
 
-    std_dev_ = {params.std_dev(0), params.std_dev(1), params.std_dev(2)};
+    std::vector sd{params.std_dev(0), params.std_dev(1), params.std_dev(2)};
+    std_dev_ = sd;
 }
 
 //TODO: Maybe we could modify something here to make it more efficient
