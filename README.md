@@ -59,6 +59,15 @@ cd UUVPlanning/third_party
 git clone https://github.com/alandefreitas/matplotplusplus.git
 ```
 
+# For Benchmark Testing
+- [OMPL](https://ompl.kavrakilab.org/index.html)
+- [STOMP](https://github.com/ros-industrial/stomp.git)
+```bash
+git clone https://github.com/ros-industrial/stomp.git
+cp -r stomp/include/stomp UUVPlanning/benchmark/include
+cp stomp/src/stomp.cpp UUVPlanning/benchmark/src
+cp stomp/src/utils.cpp UUVPlanning/benchmark/src
+```
 
 # GPMP 
 The GP Motion Planning code in GPMP2 doc is developed based on [GPMP2](https://github.com/borglab/gpmp2.git).

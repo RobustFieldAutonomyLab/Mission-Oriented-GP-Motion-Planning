@@ -1,6 +1,7 @@
 #include "yaml-cpp/yaml.h"
 #include "Planning3DUUV.h"
 #include "../benchmark/ompl/include/OMPLHelper.h"
+#include "../benchmark/stomp/include/STOMPHelper.h"
 
 namespace YAML {
     template<>
@@ -82,5 +83,30 @@ inline OMPLParameter readOMPLParamYAML(YAML::Node config){
     param.method = ompl["method"].as<string>();
     param.max_time = ompl["max_planning_time"].as<double>();
     param.cost_threshold = ompl["cost_threshold"].as<double>();
+    return param;
+}
+
+inline STOMPParameter readSTOMPParamYAML(YAML::Node config){
+    STOMPParameter param;
+    auto planner = config["planner"];
+    param.vehicle_size = planner["vehicle_size"].as<double>();
+
+    YAML::Node obstacle = planner["obstacle"];
+    param.dist_sdf = obstacle["epsilon_dist"].as<double>();
+    param.w_sdf = obstacle["cost_sigma"].as<double>();
+
+    auto map = config["map"];
+    param.origin = map["origin"].as<Vector3>();
+    param.cell_size = map["cell_size"].as<double>();
+    param.cell_size_z = map["cell_size_z"].as<double>();
+    param.sea_level = map["sea_level"].as<double>();
+
+    auto traj = config["trajectory"];
+    param.delta_t = traj["delta_t"].as<double>();
+    param.total_time_steps = traj["total_time_step"].as<int>();
+
+    auto stomp= config["stomp"];
+    param.std_dev = stomp["std_dev"].as<Vector3>();
+
     return param;
 }

@@ -55,3 +55,12 @@ ompl:
   method: "RRTStar"
   max_planning_time: 10
   cost_threshold: 1000
+
+stomp:
+  num_iterations: 1000
+  control_cost_weight: 0.0
+  num_iterations_after_valid: 0
+  num_rollouts: 200
+  max_rollouts: 200
+  initialization_method: 2
+  # 1: LINEAR_INTERPOLATION, 2: CUBIC_POLYNOMIAL_INTERPOLATION, 3: MININUM_CONTROL_COST
