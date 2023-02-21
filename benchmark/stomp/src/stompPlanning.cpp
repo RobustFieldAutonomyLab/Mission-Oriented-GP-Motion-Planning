@@ -11,9 +11,6 @@
 void recordSolution(Trajectory traj, Matrix seafloor_map, Point3 origin, double cell_size, PLOT_TYPE tp, std::string file_name)
 {
     plotEvidenceMap3D(seafloor_map,origin.x(),origin.y(),cell_size,tp);
-
-    matplot::hold(matplot::on);
-
     int num_cols = traj.cols();
     std::vector<double> X, Y, Z;
 
@@ -71,6 +68,7 @@ int main(int argc, char* argv[])
 
     auto path = config["path"];
     auto traj = config["trajectory"];
+    auto visualize = config["visualization"];
     stomp::TaskPtr task(new STOMPHelper("../" + path["seafloor_path"].as<string>(), params));
 
     stomp::StompConfiguration stomp_config = create3DOFConfiguration(config);
@@ -80,7 +78,9 @@ int main(int argc, char* argv[])
     //! [Solve]
     /**< Optimizing a trajectory close enough to the bias is produced **/
     Trajectory optimized;
-    if (stomp.solve(traj["start_position"].as<Vector3>(), traj["end_position"].as<Vector3>(), optimized))
+    Point3 start_pt = traj["start_position"].as<Vector3>();
+    Point3 end_pt = traj["end_position"].as<Vector3>();
+    if (stomp.solve(start_pt, end_pt, optimized))
     {
         std::cout << "STOMP succeeded" << std::endl;
     }
@@ -89,8 +89,17 @@ int main(int argc, char* argv[])
         std::cout << "A valid solution was not found" << std::endl;
         return -1;
     }
-    PLOT_TYPE tp;
-    Matrix data = loadSeaFloorData("../" + path["seafloor_path"].as<string>());
-    recordSolution(data, optimized, params.origin, params.cell_size, tp, "result.txt");
-    return 0;
+    if(visualize["visualize"].as<bool>()){
+        PLOT_TYPE tp;
+        if (visualize["downsize_mesh"].as<bool>()){
+            tp = PLOT_TYPE::DOWNSIZE_MESH;
+        }
+        else
+            tp = PLOT_TYPE::MESH;
+        Matrix data = loadSeaFloorData("../" + path["seafloor_path"].as<string>());
+        recordSolution(optimized, data, params.origin, params.cell_size, tp, "result.txt");
+
+    }
+
+return 0;
 }
