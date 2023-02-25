@@ -64,9 +64,9 @@ git clone https://github.com/alandefreitas/matplotplusplus.git
 - [STOMP](https://github.com/ros-industrial/stomp.git)
 ```bash
 git clone https://github.com/ros-industrial/stomp.git
-cp -r stomp/include/stomp UUVPlanning/benchmark/include
-cp stomp/src/stomp.cpp UUVPlanning/benchmark/src
-cp stomp/src/utils.cpp UUVPlanning/benchmark/src
+cp -r stomp/include/stomp UUVPlanning/benchmark/stomp/include
+cp stomp/src/stomp.cpp UUVPlanning/benchmark/stomp/src
+cp stomp/src/utils.cpp UUVPlanning/benchmark/stomp/src
 ```
 
 # GPMP 

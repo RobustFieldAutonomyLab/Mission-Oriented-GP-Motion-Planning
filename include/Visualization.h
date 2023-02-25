@@ -11,7 +11,7 @@
 #include <gtsam/geometry/Point2.h>
 #include <fstream>
 
-enum PLOT_TYPE{MESH, POINT, DOWNSIZE_MESH};
+enum PLOT_TYPE{MESH, POINT, DOWNSIZE_MESH, OFF};
 
 
 inline gtsam::Point2 get_center(double x, double y, double origin_x, double origin_y, double cell_size ){
