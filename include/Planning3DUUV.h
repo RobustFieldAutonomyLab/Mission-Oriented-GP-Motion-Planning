@@ -41,7 +41,7 @@ struct Planning3DUUVParameter{
 
     //RobotModel
     double vehicle_size = 0.2;
-
+    double Qc = 0.01;
     int check_inter = 5;
 
     //Seafloor

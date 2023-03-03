@@ -67,6 +67,26 @@ git clone https://github.com/ros-industrial/stomp.git
 cp -r stomp/include/stomp UUVPlanning/benchmark/stomp/include
 cp stomp/src/stomp.cpp UUVPlanning/benchmark/stomp/src
 cp stomp/src/utils.cpp UUVPlanning/benchmark/stomp/src
+In file stomp/src/stomp.cpp
+change line 185 to:
+Eigen::MatrixXd& parameters_optimized, double&cost)
+change line 193 to:
+  return solve(parameters_optimized_, parameters_optimized, cost);
+change line 196 to:
+bool Stomp::solve(const Eigen::VectorXd& first, const Eigen::VectorXd& last, Eigen::MatrixXd& parameters_optimized, double&cost)
+change line 205 to:
+  return solve(start, end, parameters_optimized, cost);
+change line 208 to:
+bool Stomp::solve(const Eigen::MatrixXd& initial_parameters, Eigen::MatrixXd& parameters_optimized, double&cost)
+change line 283 to:
+  cost = current_lowest_cost_;
+In file stomp/include/stomp/stomp.h
+change line 53 to:
+  bool solve(const std::vector<double>& first, const std::vector<double>& last, Eigen::MatrixXd& parameters_optimized, double& cost);
+change line 62 to:
+  bool solve(const Eigen::VectorXd& first, const Eigen::VectorXd& last, Eigen::MatrixXd& parameters_optimized, double & cost);
+change line 70 to:
+  bool solve(const Eigen::MatrixXd& initial_parameters, Eigen::MatrixXd& parameters_optimized, double & cost);
 ```
 
 # GPMP 

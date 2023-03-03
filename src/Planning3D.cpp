@@ -7,7 +7,7 @@
 Planning3D::Planning3D(double epsilon_dist,
                        double cost_sigma,
                        double vehicle_size, int check_inter) :
-                       Base(3, check_inter, cost_sigma, epsilon_dist){
+                       Base(3, check_inter, 0.01, cost_sigma, epsilon_dist){
     double spheres_data[] = {0.0, 0.0, 0.0, 0.0, vehicle_size};
     BodySphereVector sphere_vec;
 

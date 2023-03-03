@@ -29,6 +29,8 @@ inline Planning3DUUVParameter readParamYAML(YAML::Node planner){
     param.vehicle_size = planner["vehicle_size"].as<double>();
     param.check_inter  = planner["check_inter"].as<int>();
     param.max_iter     = planner["max_iter"].as<int>();
+    if (planner["Qc"])
+        param.Qc = planner["Qc"].as<double>();
 
     YAML::Node dynamics = planner["dynamics"];
     param.use_vehicle_dynamics = dynamics["use_vehicle_dynamics"].as<bool>();

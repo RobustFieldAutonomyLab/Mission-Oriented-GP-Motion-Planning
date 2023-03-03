@@ -9,7 +9,7 @@ Planning2D::Planning2D(bool use_vehicle_dynamics, double epsilon_dist,
            double vehicle_size, int check_inter):
         _use_vehicle_dynamics(use_vehicle_dynamics),
         _dynamics_sigma(dynamics_sigma),
-        Base(3, check_inter, cost_sigma, epsilon_dist){
+        Base(3, check_inter, 0.01, cost_sigma, epsilon_dist){
     double spheres_data[] = {0.0, 0.0, 0.0, 0.0, vehicle_size};
     BodySphereVector sphere_vec;
 

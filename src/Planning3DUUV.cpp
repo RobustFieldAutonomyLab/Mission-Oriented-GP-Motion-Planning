@@ -5,7 +5,7 @@ Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
         _seafloor_mission(param.seafloor_mission), _seafloor_dist(param.seafloor_dist),
         _seafloor_cost_sigma(param.seafloor_cost_sigma), _use_current(param.use_current),
         _max_iter(param.max_iter),
-        Base(6, param.check_inter,
+        Base(6, param.check_inter, param.Qc,
              param.obstacle_cost_sigma,
              param.obstacle_epsilon_dist){
 
