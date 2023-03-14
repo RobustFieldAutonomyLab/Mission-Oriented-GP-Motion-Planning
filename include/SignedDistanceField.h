@@ -55,7 +55,7 @@ inline Matrix signedDistanceField2D(Matrix ground_truth_map, double cell_size){
     return field * cell_size;
 }
 
-inline std::vector<Matrix> signedDistanceField3D(const std::vector<Matrix> &ground_truth_map, double cell_size){
+inline std::vector<Matrix> signedDistanceField3D(const std::vector<Matrix> &ground_truth_map, float cell_size, float cell_size_z = 1){
     Matrix one_map;
     int z = ground_truth_map.size();
     int rows = ground_truth_map[0].rows();
@@ -90,10 +90,10 @@ inline std::vector<Matrix> signedDistanceField3D(const std::vector<Matrix> &grou
 
     float* inv_map_dist = edt::edt<bool>(cur_map,
                                 cols, rows, z,
-                                1, 1, 1,true);
+                                cell_size, cell_size, cell_size_z,true);
     float* map_dist = edt::edt<bool>(inv_map,
                                 cols, rows, z,
-                                1, 1, 1,true);
+                                cell_size, cell_size, cell_size_z,true);
 
 
     for (int k=0; k<z; k++){
@@ -103,7 +103,7 @@ inline std::vector<Matrix> signedDistanceField3D(const std::vector<Matrix> &grou
                 int id = k*rows*cols + i*cols + j;
                 double field_this = map_dist[id] - inv_map_dist[id];
 //                cout<<" "<<inv_map_dist[id]<<" ";
-                this_layer(i,j) = field_this * cell_size;
+                this_layer(i,j) = field_this;// * cell_size;
             }
         }
 //        matplot::subplot(2, 1, 1);
@@ -164,7 +164,7 @@ inline gpmp2::SignedDistanceField* buildSDF(double cell_size, double cell_size_z
         }
     }
 
-    std::vector<Matrix> fields = signedDistanceField3D(data_3D, cell_size);
+    std::vector<Matrix> fields = signedDistanceField3D(data_3D, cell_size, cell_size_z);
     int level = 0;
     for (auto field : fields){
 //        plotEvidenceMap2D(field, 0, 0, 1);

@@ -1,12 +1,12 @@
 trajectory:
-  delta_t: 0.4
-  total_time_step: 300
-  start_position: [40, 10, -15]
+  delta_t: 1
+  total_time_step: 200
+  start_position: [400, 100, -15]
   start_rotation: [0, 0, 0]
-  start_velocity: [0, 0, 0]
+  start_velocity: [5, 0, 0]
   start_angular_velocity: [0, 0, 0]
 
-  end_position: [50, 100, -10]
+  end_position: [500, 1000, -10]
   end_rotation: [0, 0, 0]
   end_velocity: [0, 0, 0]
   end_angular_velocity: [0, 0, 0]
@@ -14,14 +14,15 @@ trajectory:
 planner:
   vehicle_size: 1
   check_inter: 10
-  max_iter: 1000
+  max_iter: 100000
+  Qc: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
 
   dynamics:
     use_vehicle_dynamics: true
     sigma: 1
   obstacle:
-    epsilon_dist: 1
-    cost_sigma: 1
+    epsilon_dist: 5
+    cost_sigma: 20
   seafloor:
     seafloor_mission: true
     epsilon_dist: 1.2
@@ -33,7 +34,7 @@ planner:
 map:
   origin: [0, 0, -35]
   sea_level: -6
-  cell_size: 1
+  cell_size: 10
   cell_size_z: 1
 
 path:
@@ -52,11 +53,11 @@ ompl:
   cost_threshold: 1000
 
 stomp:
-  num_iterations: 1000
+  num_iterations: 5000
   control_cost_weight: 0.0
   num_iterations_after_valid: 0
-  num_rollouts: 200
-  max_rollouts: 200
+  num_rollouts: 84
+  max_rollouts: 121
   initialization_method: 2
   # 1: LINEAR_INTE 2: LINEAR_INTE_WITH_CURRENT 3: LINEAR_INTE_WITH_CURRENT_AND_VELOCITY
-  std_dev: [10, 10, 10]
+  std_dev: [52, 50, 10]

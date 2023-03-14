@@ -9,7 +9,7 @@
 
 namespace gpmp2 {
     /// seafloor cost function
-    inline double SeafloorCost(const gtsam::Point3& point, const Seafloor& sf,
+    inline double  SeafloorCost(const gtsam::Point3& point, const Seafloor& sf,
                                         double eps, gtsam::OptionalJacobian<1, 3> H_point = boost::none) {
         double dist, dist_symbol;
         try {

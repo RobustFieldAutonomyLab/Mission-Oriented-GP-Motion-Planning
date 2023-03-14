@@ -99,7 +99,6 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
             graph.add(ObstacleSDFFactorPose3MobileBase (
                     key_pos, *robot, *sdf,
                     _cost_sigma, _epsilon_dist));
-
             if(_seafloor_mission){
                 graph.add(SeafloorFactorPose3MobileBase(
                         key_pos, *robot, *sf,
