@@ -129,7 +129,7 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
     params.maxIterations = _max_iter;
     Values result = optimizer.optimize();
     vector <Pose3> p;
-    savePath(file_path, result, graph.error(result));
+    savePath(file_path, result, graph.error(result)/_total_time_step);
     for (int i = 0; i <= _total_time_step; i++ ){
         Pose3 pose = result.at<Pose3>(Symbol('x', i));
         p.push_back(pose);

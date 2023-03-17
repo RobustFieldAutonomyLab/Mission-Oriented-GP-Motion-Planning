@@ -49,7 +49,19 @@ namespace gpmp2 {
 
             if (H1 || H2) {
                 Matrix16 Hp, Hv;
-                const double err = WaterCurrent3DVehicleDynamicsPose3(pose, vel.head<6>(), wcg_,Hp, Hv);
+                double err;
+                try{
+                    err = WaterCurrent3DVehicleDynamicsPose3(pose, vel.head<6>(), wcg_,Hp, Hv);
+
+                }catch (SDFQueryOutOfRange&) {
+                    if (H1) {
+                        *H1 = Matrix::Zero(1, 6);
+                    }
+                    if (H2) {
+                        *H2 = Matrix::Zero(1, 6);
+                    }
+                    return (Vector(1) << 0.0).finished();
+                }
                 if (H1) {
                     *H1 = Matrix::Zero(1, 6);
                     H1->block<1,6>(0,0) = Hp;
@@ -59,9 +71,15 @@ namespace gpmp2 {
                     H2->block<1,6>(0,0) = Hv;
                 }
                 return (Vector(1) << err).finished();
-
             } else {
-                return (Vector(1) << WaterCurrent3DVehicleDynamicsPose3(pose, vel.head<6>(), wcg_)).finished();
+                double err;
+                try{
+                    err = WaterCurrent3DVehicleDynamicsPose3(pose, vel.head<6>(), wcg_);
+
+                }catch (SDFQueryOutOfRange&) {
+                    return (Vector(1) << 0.0).finished();
+                }
+                return (Vector(1) << err).finished();
             }
         }
 

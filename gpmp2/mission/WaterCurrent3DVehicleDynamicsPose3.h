@@ -13,9 +13,9 @@ namespace gpmp2{
                                         gtsam::OptionalJacobian<1, 6> Hv = boost::none) {
         gtsam::Vector6 real_v = wcg.getVehicleVelocityWithoutCurrent(p.translation(), v);
 
-        double err = 100 * real_v(1) * real_v(1) + real_v(4) * real_v(4);
+        double err = v(4);
         if (Hp) *Hp = (gtsam::Matrix16() << 0, 0, 0, 0, 0, 0).finished();
-        if (Hv) *Hv = (gtsam::Matrix16() << 0, 200*real_v(1), 0, 0, 2*real_v(4), 0).finished();
+        if (Hv) *Hv = (gtsam::Matrix16() << 0, 0, 0, 0, 1, 0).finished();
 
         //TODO: add a scale factor for the angle
         return err;

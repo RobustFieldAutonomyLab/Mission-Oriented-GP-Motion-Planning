@@ -87,13 +87,17 @@ void run(string yaml_path){
                                     path["sdf_path"].as<string>());
     auto current = planner["current"];
     if(current["use_current"].as<bool>()){
-        vector<Matrix> current_grid_u = loadCurrentData(path["current_u_path"].as<string>());
-        vector<Matrix> current_grid_v = loadCurrentData(path["current_v_path"].as<string>());
-        p3d.buildCurrentGrid(current["cell_size"].as<double>(),
-                             current["cell_size_z"].as<double>(),
-                             current["origin"].as<Vector3>(),
-                             current_grid_u,
-                             current_grid_v);
+        double c_cell_size = current["cell_size"].as<double>();
+        double c_cell_size_z = current["cell_size_z"].as<double>();
+        Point3 c_origin = Point3(current["origin"].as<Vector3>());
+        vector<Matrix> current_grid_u = loadCurrentData(path["current_u_path"].as<string>(),
+                                    c_cell_size, c_cell_size_z,
+                                    c_origin.z(), map["sea_level"].as<double>());
+        vector<Matrix> current_grid_v = loadCurrentData(path["current_v_path"].as<string>(),
+                                    c_cell_size, c_cell_size_z,
+                                    c_origin.z(), map["sea_level"].as<double>());
+        p3d.buildCurrentGrid(c_cell_size,c_cell_size_z,c_origin,
+                             current_grid_u,current_grid_v);
     }
 
     auto result = p3d.optimize(initial_config.first,

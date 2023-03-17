@@ -122,13 +122,23 @@ inline gtsam::Matrix loadSeaFloorData(std::string file_name){
 
 }
 
-inline std::vector<gtsam::Matrix> loadCurrentData(std::string file_name){
+inline std::vector<gtsam::Matrix> loadCurrentData(const std::string& file_name,
+                              double cell_size, double cell_size_z, double origin_z, double sea_level){
     std::fstream depth_file;
     depth_file.open(file_name, std::ios::in);
     int x_width, y_width, z_width;
-    depth_file>>x_width;
-    depth_file>>y_width;
-    depth_file>>z_width;
+    double x_width_d, y_width_d, z_width_d;
+    double r_cell_size, r_cell_size_z, r_origin_z, r_sea_level;
+    depth_file>>z_width_d>>x_width_d>>y_width_d;
+    x_width = int(x_width_d); y_width = int(y_width_d); z_width = int(z_width_d);
+    depth_file>>r_cell_size>>r_cell_size_z>>r_origin_z>>r_sea_level;
+    if (r_cell_size != cell_size ||
+        r_cell_size_z != cell_size_z ||
+        r_origin_z != origin_z ||
+        r_sea_level < sea_level){
+        std::cout<<"Different cell size or origin for Current data and motion planning!"<<std::endl;
+        return std::vector<gtsam::Matrix>{};
+    }
     std::vector<gtsam::Matrix> data;
     for (int i = 0; i<z_width; i++){
         gtsam::Matrix this_layer(x_width, y_width);
@@ -141,7 +151,6 @@ inline std::vector<gtsam::Matrix> loadCurrentData(std::string file_name){
         }
         data.push_back(this_layer);
     }
-
     return data;
 }
 
