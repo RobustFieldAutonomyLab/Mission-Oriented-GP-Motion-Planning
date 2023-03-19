@@ -17,9 +17,7 @@
 
 #include "../gpmp2/mission/SeafloorFactorPose3MobileBase.h"
 #include "../gpmp2/mission/SeafloorFactorGPPose3MobileBase.h"
-
-#include "../gpmp2/mission/WaterCurrent3DVehicleDynamicsPose3.h"
-#include "../gpmp2/dynamics/VehicleDynamicsFactorWithCurrentPose3.h"
+#include "../gpmp2/gp/WaterCurrentGaussianProcessPrior.h"
 
 #include "Planning.h"
 #include "SignedDistanceField.h"

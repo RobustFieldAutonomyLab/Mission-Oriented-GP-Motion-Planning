@@ -79,10 +79,7 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
             graph.add(PriorFactor<Vector>(key_vel, vels[_total_time_step], vel_fix));
         }
 
-        if (_use_current && _use_vehicle_dynamics){
-            graph.add(VehicleDynamicsFactorWithCurrentPose3(key_pos, key_vel, *wcg, _dynamics_sigma));
-        }
-        else if(_use_vehicle_dynamics){
+        if(_use_vehicle_dynamics){
             graph.add(VehicleDynamicsFactorPose3(
                     key_pos, key_vel, _dynamics_sigma));
         }
@@ -92,9 +89,18 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
             key_pos2 = Symbol('x', i);
             key_vel1 = Symbol('v', i-1);
             key_vel2 = Symbol('v', i);
-            graph.add(GaussianProcessPriorPose3(
-                    key_pos1, key_vel1,
-                    key_pos2, key_vel2, delta_t, Qc_model));
+
+            if(_use_current){
+                graph.add(WaterCurrentGaussianProcessPrior(
+                        key_pos1, key_vel1,
+                        key_pos2, key_vel2, *wcg, delta_t, Qc_model));
+            }
+            else{
+                graph.add(GaussianProcessPriorPose3(
+                        key_pos1, key_vel1,
+                        key_pos2, key_vel2, delta_t, Qc_model));
+            }
+
 
             graph.add(ObstacleSDFFactorPose3MobileBase (
                     key_pos, *robot, *sdf,
@@ -108,12 +114,27 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
 
             for(int j = 1; j <= _check_inter+1; j++){
                 tau = j * (total_time_sec / total_check_step);
-                graph.add(ObstacleSDFFactorGPPose3MobileBase (
-                        key_pos1, key_vel1, key_pos2, key_vel2,
-                        *robot, *sdf, _cost_sigma,
-                        _epsilon_dist, Qc_model, delta_t, tau));
+                if(_use_current){
+                    graph.add(ObstacleSDFFactorGPPose3MobileBase (
+                            key_pos1, key_vel1, key_pos2, key_vel2,
+                            *robot, *sdf, *wcg, _cost_sigma,
+                            _epsilon_dist, Qc_model, delta_t, tau));
+                }
+                else{
+                    graph.add(ObstacleSDFFactorGPPose3MobileBase (
+                            key_pos1, key_vel1, key_pos2, key_vel2,
+                            *robot, *sdf, _cost_sigma,
+                            _epsilon_dist, Qc_model, delta_t, tau));
+                }
+
 
                 if(_seafloor_mission){
+                    graph.add(SeafloorFactorGPPose3MobileBase (
+                            key_pos1, key_vel1, key_pos2, key_vel2,
+                            *robot, *sf, *wcg,_seafloor_cost_sigma,
+                            _seafloor_dist, Qc_model, delta_t, tau));
+                }
+                else{
                     graph.add(SeafloorFactorGPPose3MobileBase (
                             key_pos1, key_vel1, key_pos2, key_vel2,
                             *robot, *sf, _seafloor_cost_sigma,
@@ -148,7 +169,6 @@ void Planning3DUUV::savePath(string filename, Values v, double error){
         Pose3 pose = v.at<Pose3>(Symbol('x', i));
         Vector vel = v.at<Vector>(Symbol('v', i));
         if(_use_current){
-            vel = wcg->getVehicleVelocityWithoutCurrent(pose.translation(), vel);
             cout<< "Velocity " << i <<": "<< vel<<endl;
         }
         file << pose.x()<<", "<<pose.y()<<", "<<pose.z()<<", "

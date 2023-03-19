@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 
+#include "WaterCurrentGrid.h"
 #include "Seafloor.h"
 
 
@@ -46,6 +47,10 @@ private:
     // signed distance field from matlab
     const Seafloor& sf_;
 
+    const WaterCurrentGrid& wcg_;
+
+    bool use_current_;
+
 
 public:
 
@@ -53,7 +58,9 @@ public:
     typedef boost::shared_ptr<This> shared_ptr;
 
     /* Default constructor do nothing */
-    SeafloorFactorGP() : robot_(Robot()) {}
+    SeafloorFactorGP() : robot_(Robot()),
+                            sf_(Seafloor()),
+                                wcg_(WaterCurrentGrid()) {}
 
     /**
      * Constructor
@@ -68,8 +75,18 @@ public:
             double epsilon, const gtsam::SharedNoiseModel& Qc_model, double delta_t, double tau) :
 
             Base(gtsam::noiseModel::Isotropic::Sigma(robot.nr_body_spheres(), cost_sigma),
+                 pose1Key, vel1Key, pose2Key, vel2Key), GPbase_(Qc_model, delta_t, tau),epsilon_(epsilon),
+                 robot_(robot), sf_(sf), wcg_(WaterCurrentGrid()), use_current_(false)  {}
+
+    SeafloorFactorGP(
+            gtsam::Key pose1Key, gtsam::Key vel1Key, gtsam::Key pose2Key, gtsam::Key vel2Key,
+            const Robot& robot, const Seafloor& sf, const WaterCurrentGrid& wcg, double cost_sigma,
+            double epsilon, const gtsam::SharedNoiseModel& Qc_model, double delta_t, double tau) :
+
+            Base(gtsam::noiseModel::Isotropic::Sigma(robot.nr_body_spheres(), cost_sigma),
                  pose1Key, vel1Key, pose2Key, vel2Key), GPbase_(Qc_model, delta_t, tau),
-            epsilon_(epsilon), robot_(robot), sf_(sf) {}
+            epsilon_(epsilon), robot_(robot), sf_(sf), wcg_(wcg), use_current_(true) {}
+
 
     virtual ~SeafloorFactorGP() {}
 

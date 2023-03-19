@@ -18,15 +18,24 @@ namespace gpmp2 {
         // if Jacobians used, initialize Jerr_conf as zeros
         // size: arm_nr_points_ * DOF
         Matrix Jerr_conf = Matrix::Zero(robot_.nr_body_spheres(), robot_.dof());
+        typename Robot::Velocity real_vel1, real_vel2;
 
+        if(use_current_){
+            real_vel1 = wcg_.getVehicleVelocityCurrent(conf1.translation(), vel1);
+            real_vel2 = wcg_.getVehicleVelocityCurrent(conf2.translation(), vel2);
+        }
+        else{
+            real_vel1 = vel1;
+            real_vel2 = vel2;
+        }
 
         // get conf by interpolation, except last pose
         typename Robot::Pose conf;
         Matrix Jconf_c1, Jconf_c2, Jconf_v1, Jconf_v2;
         if (use_H)
-            conf = GPbase_.interpolatePose(conf1, vel1, conf2, vel2, Jconf_c1, Jconf_v1, Jconf_c2, Jconf_v2);
+            conf = GPbase_.interpolatePose(conf1, real_vel1, conf2, real_vel2, Jconf_c1, Jconf_v1, Jconf_c2, Jconf_v2);
         else
-            conf = GPbase_.interpolatePose(conf1, vel1, conf2, vel2);
+            conf = GPbase_.interpolatePose(conf1, real_vel1, conf2, real_vel2);
 
 
         // run forward kinematics of this configuration

@@ -101,9 +101,15 @@ public:
     }
 
 
-    inline gtsam::Vector6 getVehicleVelocityWithoutCurrent(const gtsam::Point3 position, const gtsam::Vector6 velocity) const {
-        auto v_current = getVelocity(position);
-        return velocity - v_current;
+    inline gtsam::Vector6 getVehicleVelocityCurrent(const gtsam::Point3 position, const gtsam::Vector6 velocity) const {
+        gtsam::Vector6 v_current;
+        try {
+            v_current = getVelocity(position);
+        } catch (SDFQueryOutOfRange&) {
+//            cout<<"SDFQueryOutOfRange"<<position<<endl;
+            v_current = (gtsam::Vector(6) << 0, 0, 0, 0, 0, 0).finished();
+        }
+        return velocity + v_current;
     }
 
 };

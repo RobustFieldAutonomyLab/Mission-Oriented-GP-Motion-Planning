@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "../mission/WaterCurrentGrid.h"
+
 #include "../obstacle/SignedDistanceField.h"
 
 #include <gtsam/nonlinear/NonlinearFactor.h>
@@ -53,6 +55,10 @@ private:
   // signed distance field from matlab
   const SignedDistanceField& sdf_;
 
+  const WaterCurrentGrid& wcg_;
+
+  bool use_current_;
+
 
 public:
 
@@ -60,7 +66,9 @@ public:
   typedef boost::shared_ptr<This> shared_ptr;
 
   /* Default constructor do nothing */
-  ObstacleSDFFactorGP() : robot_(Robot()), sdf_(SignedDistanceField()) {}
+  ObstacleSDFFactorGP() : robot_(Robot()),
+                            sdf_(SignedDistanceField()),
+                                wcg_(WaterCurrentGrid()) {}
 
   /**
    * Constructor
@@ -75,8 +83,18 @@ public:
       double epsilon, const gtsam::SharedNoiseModel& Qc_model, double delta_t, double tau) :
 
         Base(gtsam::noiseModel::Isotropic::Sigma(robot.nr_body_spheres(), cost_sigma),
+        pose1Key, vel1Key, pose2Key, vel2Key), GPbase_(Qc_model, delta_t, tau), epsilon_(epsilon),
+        robot_(robot), sdf_(sdf), wcg_(WaterCurrentGrid()), use_current_(false) {}
+
+  ObstacleSDFFactorGP(
+      gtsam::Key pose1Key, gtsam::Key vel1Key, gtsam::Key pose2Key, gtsam::Key vel2Key,
+      const Robot& robot, const SignedDistanceField& sdf, const WaterCurrentGrid& wcg,
+      double cost_sigma, double epsilon, const gtsam::SharedNoiseModel& Qc_model,
+      double delta_t, double tau) :
+
+        Base(gtsam::noiseModel::Isotropic::Sigma(robot.nr_body_spheres(), cost_sigma),
         pose1Key, vel1Key, pose2Key, vel2Key), GPbase_(Qc_model, delta_t, tau),
-        epsilon_(epsilon), robot_(robot), sdf_(sdf) {}
+        epsilon_(epsilon), robot_(robot), sdf_(sdf), wcg_(wcg), use_current_(true) {}
 
   virtual ~ObstacleSDFFactorGP() {}
 

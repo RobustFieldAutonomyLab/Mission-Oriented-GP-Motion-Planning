@@ -108,6 +108,7 @@ public:
     if (H2) *H2 = Hpose * Hint2;
     if (H3) *H3 = Hpose * Hint3;
     if (H4) *H4 = Hpose * Hint4;
+    if (H4) *H4 = Hpose * Hint4;
   }
 
   /// interpolate velocity with Jacobians
