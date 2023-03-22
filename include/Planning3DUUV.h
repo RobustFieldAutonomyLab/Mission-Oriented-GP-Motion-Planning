@@ -57,7 +57,9 @@ struct Planning3DUUVParameter{
 class Planning3DUUV : public Planning<Pose3MobileBaseModel, SignedDistanceField>{
 public:
     explicit Planning3DUUV(Planning3DUUVParameter param);
-    Matrix buildMap(double cell_size, double cell_size_z, Point3 origin, Matrix seafloor_map, double sea_level = 0);
+    Matrix buildMap(double cell_size, double cell_size_z,
+                    Point3 origin, Matrix seafloor_map,
+                    double sea_level = 0, bool use_boundary = false);
     Matrix buildMap(double cell_size, double cell_size_z,
                     Point3 origin, Matrix seafloor_map,
                     double sea_level, string sdf_path);

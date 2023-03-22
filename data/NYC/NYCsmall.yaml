@@ -39,6 +39,7 @@ map:
   sea_level: -6
   cell_size: 100
   cell_size_z: 1
+  use_boundary: true
 
 path:
   load_sdf: false

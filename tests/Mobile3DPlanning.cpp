@@ -77,7 +77,8 @@ void run(string yaml_path){
             map["cell_size_z"].as<double>(),
                     Point3(map["origin"].as<Vector3>()),
                     seafloor_map,
-                    map["sea_level"].as<double>());
+                    map["sea_level"].as<double>(),
+                    map["use_boundary"].as<bool>());
     else
         seafloor_map = p3d.buildMap(map["cell_size"].as<double>(),
                                     map["cell_size_z"].as<double>(),

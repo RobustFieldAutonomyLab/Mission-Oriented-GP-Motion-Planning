@@ -19,8 +19,11 @@ Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
     robot = new Pose3MobileBaseModel(abs_robot, sphere_vec);
 }
 Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
-              Point3 origin, Matrix seafloor_map, double sea_level){
-    sdf = buildSDF(cell_size, cell_size_z, origin, seafloor_map, sea_level);
+              Point3 origin, Matrix seafloor_map,
+              double sea_level, bool use_boundary){
+    sdf = buildSDF(cell_size, cell_size_z,
+                   origin, seafloor_map,
+                   sea_level, use_boundary);
     sf = new Seafloor(origin, cell_size, seafloor_map);
     return seafloor_map;
 }
@@ -32,6 +35,7 @@ Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
     sf = new Seafloor(origin, cell_size, seafloor_map);
     return seafloor_map;
 }
+
 
 void Planning3DUUV::buildCurrentGrid(double cell_size, double cell_size_z, Point3 origin,
                       vector<Matrix> grid_u, vector<Matrix> grid_v){
