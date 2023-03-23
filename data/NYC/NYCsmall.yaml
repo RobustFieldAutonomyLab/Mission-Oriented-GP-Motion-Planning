@@ -1,5 +1,5 @@
 trajectory:
-  delta_t: 20
+  delta_t: 15
   total_time_step: 200
   start_position: [4000, 1000, -15]
   start_rotation: [0, 0, 0]

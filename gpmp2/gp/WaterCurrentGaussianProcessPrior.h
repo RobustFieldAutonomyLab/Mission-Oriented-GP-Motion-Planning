@@ -80,7 +80,7 @@ class WaterCurrentGaussianProcessPrior: public gtsam::NoiseModelFactor4<gtsam::P
             if (H3) *H3 = (Matrix(2*dof_, dof_) << Hlogmap * Hcomp2, Matrix::Zero(dof_, dof_)).finished();
             if (H4) *H4 = (Matrix(2*dof_, dof_) << Matrix::Zero(dof_, dof_), Matrix::Identity(dof_, dof_)).finished();
 
-            gtsam::Vector6 real_v = wcg_.getVehicleVelocityCurrent(pose1.translation(), vel1);
+            gtsam::Vector6 real_v = wcg_.getVehicleVelocityCurrentLocalFrame(pose1, vel1);
 
             return (Vector(2*dof_) << (r - real_v * delta_t_), (vel2 - vel1)).finished();
         }

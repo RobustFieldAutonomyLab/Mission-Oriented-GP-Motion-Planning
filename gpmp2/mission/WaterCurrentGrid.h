@@ -101,7 +101,7 @@ public:
     }
 
 
-    inline gtsam::Vector6 getVehicleVelocityCurrent(const gtsam::Point3 position, const gtsam::Vector6 velocity) const {
+    inline gtsam::Vector6 getVehicleVelocityCurrentGlobalFrame(const gtsam::Point3 position, const gtsam::Vector6 velocity) const {
         gtsam::Vector6 v_current;
         try {
             v_current = getVelocity(position);
@@ -109,6 +109,26 @@ public:
 //            cout<<"SDFQueryOutOfRange"<<position<<endl;
             v_current = (gtsam::Vector(6) << 0, 0, 0, 0, 0, 0).finished();
         }
+        return velocity + v_current;
+    }
+
+    inline gtsam::Vector6 getVehicleVelocityCurrentLocalFrame(const gtsam::Pose3 pose, const gtsam::Vector6 velocity) const {
+        gtsam::Vector6 v_current;
+        try {
+            v_current = getVelocity(pose.translation());
+        } catch (SDFQueryOutOfRange&) {
+//            cout<<"SDFQueryOutOfRange"<<position<<endl;
+            v_current = (gtsam::Vector(6) << 0, 0, 0, 0, 0, 0).finished();
+        }
+
+        gtsam::Point3 v_current_pose = gtsam::Point3(
+                gtsam::Point3(v_current(3), v_current(4), v_current(5)));
+        gtsam::Pose3 pose_ori = gtsam::Pose3(pose.rotation(),
+                gtsam::Point3(0, 0, 0));
+        gtsam::Point3 v_current_local = pose_ori.transform_to(v_current_pose);
+//        cout<<v_current_local<<endl;
+        v_current = (gtsam::Vector(6) << 0, 0, 0,
+                v_current_local.x(), v_current_local.y(), v_current_local.z()).finished();
         return velocity + v_current;
     }
 

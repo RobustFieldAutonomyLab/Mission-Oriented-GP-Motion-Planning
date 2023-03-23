@@ -21,8 +21,8 @@ namespace gpmp2 {
         typename Robot::Velocity real_vel1, real_vel2;
 
         if(use_current_){
-            real_vel1 = wcg_.getVehicleVelocityCurrent(conf1.translation(), vel1);
-            real_vel2 = wcg_.getVehicleVelocityCurrent(conf2.translation(), vel2);
+            real_vel1 = wcg_.getVehicleVelocityCurrentLocalFrame(conf1, vel1);
+            real_vel2 = wcg_.getVehicleVelocityCurrentLocalFrame(conf2, vel2);
         }
         else{
             real_vel1 = vel1;
