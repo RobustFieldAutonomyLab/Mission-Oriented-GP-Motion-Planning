@@ -1,9 +1,9 @@
 trajectory:
-  delta_t: 0.4
+  delta_t: 1
   total_time_step: 100
   start_position: [5, 5, -4220]
   start_rotation: [0, 0, 0]
-  start_velocity: [0, 0, 0]
+  start_velocity: [2, 0, 0]
   start_angular_velocity: [0, 0, 0]
 
   end_position: [45, 45, -4182]
@@ -15,6 +15,7 @@ planner:
   vehicle_size: 1
   check_inter: 10
   max_iter: 1000
+  Qc: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
 
   dynamics:
     use_vehicle_dynamics: true
@@ -38,6 +39,7 @@ map:
   sea_level: -4180
   cell_size: 1
   cell_size_z: 1
+  use_boundary: true
 
 path:
   load_sdf: false

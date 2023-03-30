@@ -1,12 +1,12 @@
 trajectory:
-  delta_t: 15
+  delta_t: 0.5
   total_time_step: 200
-  start_position: [4000, 1000, -15]
+  start_position: [40, 10, -15]
   start_rotation: [0, 0, 0]
   start_velocity: [2, 0, 0]
   start_angular_velocity: [0, 0, 0]
 
-  end_position: [5000, 10000, -10]
+  end_position: [50, 100, -10]
   end_rotation: [0, 0, 0]
   end_velocity: [0, 0, 0]
   end_angular_velocity: [0, 0, 0]
@@ -21,23 +21,24 @@ planner:
     use_vehicle_dynamics: true
     sigma: 1
   obstacle:
-    epsilon_dist: 5
-    cost_sigma: 20
+    #When using big cell size, use bigger epsilon_dist
+    epsilon_dist: 1
+    cost_sigma: 1
   seafloor:
     seafloor_mission: true
     epsilon_dist: 1.2
     cost_sigma: 1
 
   current:
-    use_current: true
-    cell_size: 100
+    use_current: false
+    cell_size: 1
     cell_size_z: 3
     origin: [0, 0, -32]
 
 map:
   origin: [0, 0, -35]
   sea_level: -6
-  cell_size: 100
+  cell_size: 1
   cell_size_z: 1
   use_boundary: true
 

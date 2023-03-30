@@ -23,7 +23,7 @@ Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
               double sea_level, bool use_boundary){
     sdf = buildSDF(cell_size, cell_size_z,
                    origin, seafloor_map,
-                   sea_level, use_boundary);
+                    use_boundary, sea_level);
     sf = new Seafloor(origin, cell_size, seafloor_map);
     return seafloor_map;
 }
