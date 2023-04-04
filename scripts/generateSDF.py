@@ -37,7 +37,7 @@ def main(argv):
 
     seafloor_map = readSeafloorMap(input_file)
     field = grid23Dfield(seafloor_map, cell_size_z, floor_level, surface_level)
-    sdf_data = signedDistanceField3D(field, cell_size)
+    sdf_data = signedDistanceField3D(field, cell_size, cell_size_z)
     saveSDF(sdf_data, output_file, cell_size, cell_size_z, floor_level, surface_level)
 
 def readSeafloorMap(seafloor_path):
@@ -71,10 +71,12 @@ def grid23Dfield(grid, cell_size_z, floor_level, surface_level):
                     field[z,i,j] = 1
                 elif z * cell_size_z + floor_level < grid[i,j]:
                     field[z,i,j] = 1
+                elif i == 0 or j == 0 or i == rows-1 or j == cols-1:
+                    field[z,i,j] = 1
     return field
 
 # from GPMP2 python wrap
-def signedDistanceField3D(ground_truth_map, cell_size):
+def signedDistanceField3D(ground_truth_map, cell_size, cell_size_z):
     # SIGNEDDISTANCEFIELD3D 3D signed distance field
     #   Given a ground truth 3D map defined in Matrix in 0-1,
     #   calculate 3D signed distance field, which is defined as a matrix
@@ -99,8 +101,8 @@ def signedDistanceField3D(ground_truth_map, cell_size):
 
     # get signed distance from map and inverse map
     # since bwdist(foo) = ndimage.distance_transform_edt(1-foo)
-    map_dist = ndimage.distance_transform_edt(inv_map)
-    inv_map_dist = ndimage.distance_transform_edt(cur_map)
+    map_dist = ndimage.distance_transform_edt(inv_map, sampling=(cell_size_z, cell_size, cell_size))
+    inv_map_dist = ndimage.distance_transform_edt(cur_map, sampling=(cell_size_z, cell_size, cell_size))
 
     field = map_dist - inv_map_dist
 

@@ -19,14 +19,19 @@ planner:
 
   dynamics:
     use_vehicle_dynamics: true
+    #Weight for kinematic constraints
     sigma: 1
   obstacle:
+    #SDF parameter, Obstacle avoidance safe threshold
     #When using big cell size, use bigger epsilon_dist
     epsilon_dist: 1
+    #Weight for obstacle avoidance
     cost_sigma: 1
   seafloor:
     seafloor_mission: true
+    #Interest distance from seafloor
     epsilon_dist: 1.2
+    #Weight for seafloor mission
     cost_sigma: 1
 
   current:
