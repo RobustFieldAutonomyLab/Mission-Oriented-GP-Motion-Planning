@@ -132,13 +132,13 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
                 }
 
 
-                if(_seafloor_mission){
+                if(_use_current && _seafloor_mission){
                     graph.add(SeafloorFactorGPPose3MobileBase (
                             key_pos1, key_vel1, key_pos2, key_vel2,
                             *robot, *sf, *wcg,_seafloor_cost_sigma,
                             _seafloor_dist, Qc_model, delta_t, tau));
                 }
-                else{
+                else if(_seafloor_mission){
                     graph.add(SeafloorFactorGPPose3MobileBase (
                             key_pos1, key_vel1, key_pos2, key_vel2,
                             *robot, *sf, _seafloor_cost_sigma,
