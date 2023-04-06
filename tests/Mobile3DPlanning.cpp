@@ -5,8 +5,8 @@ using namespace std;
 
 pair<vector<Pose3>, vector<Vector>> generateInitialTrajectory(const Pose3& start_pose, const Vector& start_vel,
                                                               const Pose3& end_pose, const Vector& end_vel,
-                                                              double delta_t, int total_time_step) {
-    Vector avg_vel;
+                                                              const Vector& avg_vel, int total_time_step) {
+//    Vector avg_vel;
 //    Vector6 avg_vel6;
 //    avg_vel6 << Vector3((end_pose.rotation().roll() - start_pose.rotation().roll())/delta_t/total_time_step,
 //                        (end_pose.rotation().pitch() - start_pose.rotation().pitch())/delta_t/total_time_step,
@@ -14,7 +14,9 @@ pair<vector<Pose3>, vector<Vector>> generateInitialTrajectory(const Pose3& start
 //            Vector3((end_pose.x() - start_pose.x())/delta_t/total_time_step,
 //                    (end_pose.y() - start_pose.y())/delta_t/total_time_step,
 //                    (end_pose.z() - start_pose.z())/delta_t/total_time_step);
-    avg_vel = start_vel;
+//    avg_vel6 << 2, 0, 0, 0, 0, 0;
+//    avg_vel = avg_vel6;
+//    avg_vel = start_vel;
     vector <Pose3> ps;
     vector <Vector> vs;
     for (int i = 0; i<=total_time_step; i++){
@@ -54,23 +56,26 @@ void run(string yaml_path){
     auto e_pos = traj["end_position"].as<Vector3>();
     auto e_vel = traj["end_velocity"].as<Vector3>();
     auto e_ang = traj["end_angular_velocity"].as<Vector3>();
+    auto a_vel = traj["average_velocity"].as<Vector3>();
+    auto a_ang = traj["average_angular_velocity"].as<Vector3>();
 
     Pose3 start_pose = Pose3(Rot3::RzRyRx(s_rot[2], s_rot[1], s_rot[0]),
                              Point3(s_pos[0], s_pos[1], s_pos[2]));
-    Vector start_vel;
-    Vector6 start_vel6;
+    Vector start_vel, end_vel, avg_vel;
+    Vector6 start_vel6, end_vel6, avg_vel6;
     start_vel6 << s_ang, s_vel;
     start_vel = start_vel6;
 
     Pose3 end_pose = Pose3(Rot3::RzRyRx(e_rot[2], e_rot[1], e_rot[0]),
                            Point3(e_pos[0], e_pos[1], e_pos[2]));
-    Vector end_vel;
-    Vector6 end_vel6;
     end_vel6 << e_ang, e_vel;
     end_vel = end_vel6;
 
+    avg_vel6 << a_ang, a_vel;
+    avg_vel = avg_vel6;
+
     auto initial_config = generateInitialTrajectory(start_pose, start_vel,
-                                                    end_pose, end_vel, delta_t, total_time_step);
+                                                    end_pose, end_vel, avg_vel, total_time_step);
     Matrix seafloor_map = loadSeaFloorData(path["seafloor_path"].as<string>());
     if(!path["load_sdf"].as<bool>() && path["sdf_path"])
         seafloor_map = p3d.buildMap(map["cell_size"].as<double>(),
@@ -86,6 +91,8 @@ void run(string yaml_path){
                                     seafloor_map,
                                     map["sea_level"].as<double>(),
                                     path["sdf_path"].as<string>());
+
+
     auto current = planner["current"];
     if(current["use_current"].as<bool>()){
         double c_cell_size = current["cell_size"].as<double>();

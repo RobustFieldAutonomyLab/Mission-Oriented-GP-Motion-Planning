@@ -1,15 +1,18 @@
 trajectory:
-  delta_t: 0.5
+  delta_t: 0.6
   total_time_step: 200
-  start_position: [40, 10, -15]
+  start_position: [50, 100, -8]
   start_rotation: [0, 0, 0]
-  start_velocity: [2, 0, 0]
+  start_velocity: [0, 0, 0]
   start_angular_velocity: [0, 0, 0]
 
-  end_position: [50, 100, -10]
+  end_position: [40, 10, -8]
   end_rotation: [0, 0, 0]
   end_velocity: [0, 0, 0]
   end_angular_velocity: [0, 0, 0]
+
+  average_velocity: [2, 0, 0]
+  average_angular_velocity: [0, 0, 0]
 
 planner:
   vehicle_size: 1
@@ -18,7 +21,7 @@ planner:
   Qc: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
 
   dynamics:
-    use_vehicle_dynamics: true
+    use_vehicle_dynamics: false
     #Weight for kinematic constraints
     sigma: 1
   obstacle:
@@ -26,13 +29,16 @@ planner:
     #When using big cell size, use bigger epsilon_dist
     epsilon_dist: 1
     #Weight for obstacle avoidance
-    cost_sigma: 1
+    cost_sigma: 2
   seafloor:
     seafloor_mission: true
     #Interest distance from seafloor
     epsilon_dist: 1.2
     #Weight for seafloor mission
     cost_sigma: 1
+    #use a polygon to define the x,y coordinate region of interest
+#    region_of_interest: [ [ 20, 0 ], [ 60, 0 ], [ 60, 40 ], [ 20, 40 ] ]
+    region_of_interest: [ [ 0, 0 ], [ 80, 0 ], [ 80, 120 ], [ 0, 120 ] ]
 
   current:
     use_current: false

@@ -1,5 +1,5 @@
 trajectory:
-  delta_t: 1
+  delta_t: 0.4
   total_time_step: 100
   start_position: [5, 5, -4220]
   start_rotation: [0, 0, 0]
@@ -24,7 +24,7 @@ planner:
     epsilon_dist: 1
     cost_sigma: 0.2
   seafloor:
-    seafloor_mission: true
+    seafloor_mission: false
     epsilon_dist: 1.2
     cost_sigma: 0.2
 

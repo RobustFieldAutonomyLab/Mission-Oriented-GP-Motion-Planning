@@ -4,7 +4,7 @@ Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
         _use_vehicle_dynamics(param.use_vehicle_dynamics), _dynamics_sigma(param.dynamics_sigma),
         _seafloor_mission(param.seafloor_mission), _seafloor_dist(param.seafloor_dist),
         _seafloor_cost_sigma(param.seafloor_cost_sigma), _use_current(param.use_current),
-        _max_iter(param.max_iter),
+        _max_iter(param.max_iter), _region_of_interest(param.region_of_interest),
         Base(6, param.check_inter, param.Qc,
              param.obstacle_cost_sigma,
              param.obstacle_epsilon_dist){
@@ -12,7 +12,8 @@ Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
     double spheres_data[] = {0.0, 0.0, 0.0, 0.0, param.vehicle_size};
     BodySphereVector sphere_vec;
 
-    sphere_vec.emplace_back(BodySphere(spheres_data[0], spheres_data[4], Point3(spheres_data[1], spheres_data[2], spheres_data[3])));
+    sphere_vec.emplace_back(BodySphere(spheres_data[0], spheres_data[4],
+                                       Point3(spheres_data[1], spheres_data[2], spheres_data[3])));
 
     Pose3MobileBase abs_robot;
 
@@ -24,7 +25,7 @@ Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
     sdf = buildSDF(cell_size, cell_size_z,
                    origin, seafloor_map,
                     use_boundary, sea_level);
-    sf = new Seafloor(origin, cell_size, seafloor_map);
+    sf = new Seafloor(origin, cell_size, seafloor_map, _region_of_interest);
     return seafloor_map;
 }
 
@@ -32,7 +33,7 @@ Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
                                Point3 origin, Matrix seafloor_map,
                                double sea_level, string sdf_path){
     sdf = loadSDF(cell_size, cell_size_z, origin, seafloor_map, sea_level, sdf_path);
-    sf = new Seafloor(origin, cell_size, seafloor_map);
+    sf = new Seafloor(origin, cell_size, seafloor_map, _region_of_interest);
     return seafloor_map;
 }
 

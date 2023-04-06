@@ -183,6 +183,10 @@ inline std::vector<gtsam::Matrix> loadSDFData(std::string file_name,
                 r_origin_z != origin_z ||
                     r_sea_level != sea_level){
         std::cout<<"Different cell size or origin for SDF data and motion planning!"<<std::endl;
+        std::cout<<r_cell_size<<" "<<cell_size<<std::endl;
+        std::cout<<r_cell_size_z<<" "<<cell_size_z<<std::endl;
+        std::cout<<r_origin_z<<" "<<origin_z<<std::endl;
+        std::cout<<r_sea_level<<" "<<sea_level<<std::endl;
         return std::vector<gtsam::Matrix>{};
     }
     std::vector<gtsam::Matrix> data;
