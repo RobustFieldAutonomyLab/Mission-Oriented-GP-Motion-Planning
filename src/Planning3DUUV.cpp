@@ -3,7 +3,10 @@
 Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
         _use_vehicle_dynamics(param.use_vehicle_dynamics), _dynamics_sigma(param.dynamics_sigma),
         _seafloor_mission(param.seafloor_mission), _seafloor_dist(param.seafloor_dist),
-        _seafloor_cost_sigma(param.seafloor_cost_sigma), _use_current(param.use_current),
+        _seafloor_cost_sigma(param.seafloor_cost_sigma),
+        _sealevel_mission(param.sealevel_mission), _sealevel_dist(param.sealevel_dist),
+        _sealevel_cost_sigma(param.sealevel_cost_sigma),
+        _use_current(param.use_current),
         _max_iter(param.max_iter),
         Base(6, param.check_inter, param.Qc,
              param.obstacle_cost_sigma,
@@ -22,6 +25,7 @@ Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
 Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
               Point3 origin, Matrix seafloor_map,
               double sea_level, bool use_boundary){
+    _sea_level = sea_level;
     sdf = buildSDF(cell_size, cell_size_z,
                    origin, seafloor_map,
                     use_boundary, sea_level);
@@ -32,6 +36,7 @@ Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
 Matrix Planning3DUUV::buildMap(double cell_size, double cell_size_z,
                                Point3 origin, Matrix seafloor_map,
                                double sea_level, string sdf_path){
+    _sea_level = sea_level;
     sdf = loadSDF(cell_size, cell_size_z, origin, seafloor_map, sea_level, sdf_path);
     sf = new Seafloor(origin, cell_size, seafloor_map);
     return seafloor_map;
@@ -116,6 +121,12 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
                         _seafloor_cost_sigma,
                         _seafloor_dist));
             }
+            if(_sealevel_mission){
+                graph.add(SealevelFactorPose3MobileBase(
+                        key_pos, *robot, _sea_level,
+                        _sealevel_cost_sigma,
+                        _sealevel_dist));
+            }
 
             for(int j = 1; j <= _check_inter+1; j++){
                 tau = j * (total_time_sec / total_check_step);
@@ -133,19 +144,32 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
                 }
 
 
-                if(_use_current && _seafloor_mission&& i> _total_time_step/2){
+                if(_use_current && _seafloor_mission){
                     graph.add(SeafloorFactorGPPose3MobileBase (
                             key_pos1, key_vel1, key_pos2, key_vel2,
                             *robot, *sf, *wcg,_seafloor_cost_sigma,
                             _seafloor_dist, Qc_model, delta_t, tau));
                 }
-                else if(_seafloor_mission&& i> _total_time_step/2){
+                else if(_seafloor_mission){
                     graph.add(SeafloorFactorGPPose3MobileBase (
                             key_pos1, key_vel1, key_pos2, key_vel2,
                             *robot, *sf, _seafloor_cost_sigma,
                             _seafloor_dist, Qc_model, delta_t, tau));
                 }
-
+                if(_use_current && _sealevel_mission){
+                    graph.add(SealevelFactorGPPose3MobileBase (
+                            key_pos1, key_vel1, key_pos2, key_vel2,
+                            *robot, _sea_level, *wcg,
+                            _sealevel_cost_sigma,
+                            _sealevel_dist, Qc_model, delta_t, tau));
+                }
+                else if(_sealevel_mission){
+                    graph.add(SealevelFactorGPPose3MobileBase (
+                            key_pos1, key_vel1, key_pos2, key_vel2,
+                            *robot, _sea_level,
+                            _sealevel_cost_sigma,
+                            _sealevel_dist, Qc_model, delta_t, tau));
+                }
             }
         }
     }

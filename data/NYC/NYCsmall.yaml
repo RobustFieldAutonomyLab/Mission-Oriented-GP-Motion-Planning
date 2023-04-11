@@ -30,11 +30,18 @@ planner:
     epsilon_dist: 1
     #Weight for obstacle avoidance
     cost_sigma: 2
+  #not sure whether we could have seafloor and sealevel mission at the same time
   seafloor:
     seafloor_mission: true
     #Interest distance from seafloor
     epsilon_dist: 1.2
     #Weight for seafloor mission
+    cost_sigma: 1
+  sealevel:
+    sealevel_mission: false
+    #Interest distance from sealevel
+    epsilon_dist: 1.2
+    #Weight for sealevel mission
     cost_sigma: 1
 
   current:
@@ -45,7 +52,7 @@ planner:
 
 map:
   origin: [0, 0, -35]
-  sea_level: -6
+  sea_level: -4
   cell_size: 1
   cell_size_z: 1
   use_boundary: true

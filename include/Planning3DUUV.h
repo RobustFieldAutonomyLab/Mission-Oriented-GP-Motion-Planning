@@ -18,6 +18,8 @@
 #include "../gpmp2/mission/SeafloorFactorPose3MobileBase.h"
 #include "../gpmp2/mission/SeafloorFactorGPPose3MobileBase.h"
 #include "../gpmp2/gp/WaterCurrentGaussianProcessPrior.h"
+#include "../gpmp2/mission/SealevelFactorPose3MobileBase.h"
+#include "../gpmp2/mission/SealevelFactorGPPose3MobileBase.h"
 
 #include "Planning.h"
 #include "SignedDistanceField.h"
@@ -46,6 +48,11 @@ struct Planning3DUUVParameter{
     bool seafloor_mission = true;
     double seafloor_dist = 1;
     double seafloor_cost_sigma = 2;
+
+    //Sealevel
+    bool sealevel_mission = false;
+    double sealevel_dist = 0;
+    double sealevel_cost_sigma = 0;
 
     //Water current
     bool use_current = false;
@@ -79,6 +86,12 @@ private:
     bool _seafloor_mission;
     double _seafloor_dist;
     double _seafloor_cost_sigma;
+
+    //Sealevel
+    bool _sealevel_mission;
+    double _sealevel_dist;
+    double _sealevel_cost_sigma;
+    double _sea_level;
 
     bool _use_vehicle_dynamics;
     double _dynamics_sigma;//the smaller, the stronger the constraint

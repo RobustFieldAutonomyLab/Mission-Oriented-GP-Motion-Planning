@@ -46,6 +46,14 @@ inline Planning3DUUVParameter readParamYAML(YAML::Node planner){
         param.seafloor_cost_sigma = seafloor["cost_sigma"].as<double>();
         param.seafloor_dist = seafloor["epsilon_dist"].as<double>();
     }
+
+    YAML::Node sealevel = planner["sealevel"];
+    param.sealevel_mission = sealevel["sealevel_mission"].as<bool>();
+    if(param.sealevel_mission){
+        param.sealevel_cost_sigma = sealevel["cost_sigma"].as<double>();
+        param.sealevel_dist = sealevel["epsilon_dist"].as<double>();
+    }
+
     YAML::Node current = planner["current"];
     param.use_current = current["use_current"].as<bool>();
     return param;
