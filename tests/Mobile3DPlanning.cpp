@@ -14,7 +14,7 @@ pair<vector<Pose3>, vector<Vector>> generateInitialTrajectory(const Pose3& start
 //            Vector3((end_pose.x() - start_pose.x())/delta_t/total_time_step,
 //                    (end_pose.y() - start_pose.y())/delta_t/total_time_step,
 //                    (end_pose.z() - start_pose.z())/delta_t/total_time_step);
-//    avg_vel6 << 2, 0, 0, 0, 0, 0;
+////    avg_vel6 << 2, 0, 0, 0, 0, 0;
 //    avg_vel = avg_vel6;
 //    avg_vel = start_vel;
     vector <Pose3> ps;

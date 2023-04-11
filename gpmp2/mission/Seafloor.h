@@ -21,16 +21,15 @@ private:
     size_t field_rows_{}, field_cols_{};
     double cell_size_{};
     gtsam::Matrix data_;
-    vector<Point2> region_of_interest_;
 
 public:
     Seafloor() {}
 
     Seafloor(gtsam::Point3  origin, double cell_size,
-             const gtsam::Matrix& data, vector<Point2> region_of_interest) :
+             const gtsam::Matrix& data) :
         origin_(std::move(origin)), cell_size_(cell_size),
             field_cols_(data.cols()), field_rows_(data.rows()),
-                data_(data), region_of_interest_(std::move(region_of_interest)) {}
+                data_(data) {}
 
     ~Seafloor() {}
 
@@ -70,23 +69,23 @@ public:
         return std::make_pair(row, col);
     }
 
-    inline bool isPointInRegionOfInterest(const gtsam::Point3& point) const {
-        return pnpoly(point.x(), point.y());
-    }
-
-    inline bool pnpoly(float x, float y) const {
-        int npol = int(region_of_interest_.size());
-        int i, j, c = 0;
-        for (i = 0, j = npol-1; i < npol; j = i++) {
-            if ((((region_of_interest_[i].y() <= y) && (y < region_of_interest_[j].y())) ||
-                 ((region_of_interest_[j].y() <= y) && (y < region_of_interest_[i].y()))) &&
-                (x < (region_of_interest_[j].x() - region_of_interest_[i].x()) *
-                    (y - region_of_interest_[i].y()) / (region_of_interest_[j].y() - region_of_interest_[i].y())
-                    + region_of_interest_[i].x()))
-                c = !c;
-        }
-        return c;
-    }
+//    inline bool isPointInRegionOfInterest(const gtsam::Point3& point) const {
+//        return pnpoly(point.x(), point.y());
+//    }
+//
+//    inline bool pnpoly(float x, float y) const {
+//        int npol = int(region_of_interest_.size());
+//        int i, j, c = 0;
+//        for (i = 0, j = npol-1; i < npol; j = i++) {
+//            if ((((region_of_interest_[i].y() <= y) && (y < region_of_interest_[j].y())) ||
+//                 ((region_of_interest_[j].y() <= y) && (y < region_of_interest_[i].y()))) &&
+//                (x < (region_of_interest_[j].x() - region_of_interest_[i].x()) *
+//                    (y - region_of_interest_[i].y()) / (region_of_interest_[j].y() - region_of_interest_[i].y())
+//                    + region_of_interest_[i].x()))
+//                c = !c;
+//        }
+//        return c;
+//    }
 
 };
 

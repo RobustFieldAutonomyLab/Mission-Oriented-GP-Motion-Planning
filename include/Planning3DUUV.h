@@ -46,7 +46,6 @@ struct Planning3DUUVParameter{
     bool seafloor_mission = true;
     double seafloor_dist = 1;
     double seafloor_cost_sigma = 2;
-    std::vector<gtsam::Point2> region_of_interest;
 
     //Water current
     bool use_current = false;
@@ -80,7 +79,6 @@ private:
     bool _seafloor_mission;
     double _seafloor_dist;
     double _seafloor_cost_sigma;
-    std::vector<gtsam::Point2> _region_of_interest;
 
     bool _use_vehicle_dynamics;
     double _dynamics_sigma;//the smaller, the stronger the constraint

@@ -11,12 +11,6 @@ namespace gpmp2 {
     /// seafloor cost function
     inline double  SeafloorCost(const gtsam::Point3& point, const Seafloor& sf,
                                         double eps, gtsam::OptionalJacobian<1, 3> H_point = boost::none) {
-        if (!sf.isPointInRegionOfInterest(point)) {
-            if (H_point) *H_point = gtsam::Matrix13::Zero();
-            return 1.0;
-        }
-
-
         double dist, dist_symbol;
         try {
             dist = sf.getDistance(point);
@@ -24,7 +18,6 @@ namespace gpmp2 {
             if (H_point) *H_point = gtsam::Matrix13::Zero();
             return 0.0;
         }
-
         if (dist < eps) {
             // close enough no error
             if (H_point) *H_point = gtsam::Matrix13::Zero();

@@ -21,7 +21,7 @@ planner:
   Qc: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
 
   dynamics:
-    use_vehicle_dynamics: false
+    use_vehicle_dynamics: true
     #Weight for kinematic constraints
     sigma: 1
   obstacle:
@@ -36,9 +36,6 @@ planner:
     epsilon_dist: 1.2
     #Weight for seafloor mission
     cost_sigma: 1
-    #use a polygon to define the x,y coordinate region of interest
-#    region_of_interest: [ [ 20, 0 ], [ 60, 0 ], [ 60, 40 ], [ 20, 40 ] ]
-    region_of_interest: [ [ 0, 0 ], [ 80, 0 ], [ 80, 120 ], [ 0, 120 ] ]
 
   current:
     use_current: false
