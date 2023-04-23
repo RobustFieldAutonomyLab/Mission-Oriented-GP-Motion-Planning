@@ -2,7 +2,11 @@
 #include "../include/YAMLReader.h"
 #include <matplot/matplot.h>
 #include "stomp/stomp.h"
-
+#include <chrono>
+#include <iostream>
+#include <sstream>
+#include <sys/stat.h>
+#include <unistd.h>
 /**
  * @brief Creates a STOMP configuration object with default parameters.
  * @return A STOMP configuration object
@@ -15,12 +19,12 @@ inline STOMPParameter readSTOMPParamYAML(YAML::Node config){
 
     auto obstacle = planner["obstacle"];
     param.dist_sdf = obstacle["epsilon_dist"].as<double>();
-    param.w_sdf = obstacle["cost_sigma"].as<double>();
+    param.w_sdf = 1 / obstacle["cost_sigma"].as<double>();
 
     auto seafloor = planner["seafloor"];
     if(seafloor["seafloor_mission"].as<bool>()){
         param.dist_sf = seafloor["epsilon_dist"].as<double>();
-        param.w_sf = seafloor["cost_sigma"].as<double>();
+        param.w_sf = 1 / seafloor["cost_sigma"].as<double>();
     }
     else{
         param.dist_sf = 0;
@@ -43,14 +47,25 @@ inline STOMPParameter readSTOMPParamYAML(YAML::Node config){
     return param;
 }
 
-void recordSolution(Trajectory traj, Matrix seafloor_map, double cost, Point3 origin, double cell_size, PLOT_TYPE tp, std::string file_name)
+void recordSolution(Trajectory traj, Matrix seafloor_map, double cost, Point3 origin, double cell_size,
+                    double time, PLOT_TYPE tp, std::string file_name)
 {
     int num_cols = traj.cols();
+    double d = 0;
+    for (int i = 1; i < num_cols; i++){
+        Point3 p1(traj(0,i-1), traj(1,i-1), traj(2,i-1));
+        Point3 p2(traj(0,i), traj(1,i), traj(2,i));
+        d = d + gtsam::distance3(p1, p2);
+    }
     std::vector<double> X, Y, Z;
 
     std::ofstream file;
     file.open (file_name);
-    file << "total_error: "<< cost <<std::endl;
+    file << "Computational Time: " << time << std::endl;
+    file << "Traj Length: " << d <<std::endl;
+    file << "Total Timestamp: " << num_cols <<std::endl;
+    file << "Total Cost: "<< cost * num_cols <<std::endl;
+    file << "Average Cost: "<<cost << std::endl;
     file << "x, y, z"<<std::endl;
 
     for (int i = 0; i < num_cols; i++)
@@ -101,6 +116,7 @@ stomp::StompConfiguration create3DOFConfiguration(YAML::Node node)
             c.initialization_method = TrajectoryInitializations::LINEAR_INTERPOLATION;
             break;
     }
+    c.exponentiated_cost_sensitivity = 1;
     c.num_iterations_after_valid = stomp["num_iterations_after_valid"].as<int>();
     c.num_rollouts = stomp["num_rollouts"].as<int>();
     c.max_rollouts = stomp["max_rollouts"].as<int>();
@@ -108,11 +124,7 @@ stomp::StompConfiguration create3DOFConfiguration(YAML::Node node)
     return c;
 }
 
-int main(int argc, char* argv[])
-{
-    YAML::Node config = YAML::LoadFile(argv[1]);
-    STOMPParameter params = readSTOMPParamYAML(config);
-
+void run(YAML::Node config, STOMPParameter params, string out_path){
     auto path = config["path"];
     auto traj = config["trajectory"];
     auto visualize = config["visualization"];
@@ -128,6 +140,7 @@ int main(int argc, char* argv[])
     Point3 start_pt = traj["start_position"].as<Vector3>();
     Point3 end_pt = traj["end_position"].as<Vector3>();
     double cost;
+    auto start_time = std::chrono::high_resolution_clock::now();
     if (stomp.solve(start_pt, end_pt, optimized, cost))
     {
         std::cout << "STOMP succeeded" << std::endl;
@@ -140,6 +153,9 @@ int main(int argc, char* argv[])
         cost = cost * 100;
 //        return -1;
     }
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+
     PLOT_TYPE tp;
     if(visualize["visualize"].as<bool>()){
         if (visualize["downsize_mesh"].as<bool>()){
@@ -152,8 +168,24 @@ int main(int argc, char* argv[])
         tp = PLOT_TYPE::OFF;
 //    Matrix data = loadSeaFloorData("../" + path["seafloor_path"].as<string>());
     Matrix data = loadSeaFloorData(path["seafloor_path"].as<string>());
-    recordSolution(optimized, data, cost, params.origin, params.cell_size, tp, argv[2]);
+    recordSolution(optimized, data, cost, params.origin, params.cell_size, elapsed_time.count(), tp, out_path);
 
+}
+
+int main(int argc, char* argv[])
+{
+    YAML::Node config = YAML::LoadFile(argv[1]);
+    STOMPParameter params = readSTOMPParamYAML(config);
+
+    auto stomp_param = config["stomp"];
+    int  repeat_times = stomp_param["repeat_times"].as<int>();
+    string out_dir = stomp_param["out_dir"].as<string>();
+    int create_dir = mkdir(out_dir.data(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    for (int i = 0; i < repeat_times; i++){
+        std::stringstream ss;
+        ss<< out_dir <<"/"<<i<<".txt";
+        run(config, params, ss.str());
+    }
 
     return 0;
 }

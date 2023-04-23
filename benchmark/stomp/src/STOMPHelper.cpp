@@ -11,10 +11,10 @@ STOMPHelper::STOMPHelper(const std::string& file_name,
 
     gtsam::Matrix data = loadSeaFloorData(file_name);
     sf_ = new gpmp2::Seafloor(origin_, cell_size_, data);
-    sdf_ = buildSDF(cell_size_, params.cell_size_z, origin_, data, params.sea_level);
+    sdf_ = buildSDF(cell_size_, params.cell_size_z, origin_, data,0, params.sea_level);
 
-    double maxX = origin_.x() + sf_->getColScale() * cell_size_;
-    double maxY = origin_.y() + sf_->getRowScale() * cell_size_;
+    double maxX = origin_.x() + sf_->getColScale();
+    double maxY = origin_.y() + sf_->getRowScale();
     double maxZ = origin_.z() +
                   int(params.sea_level - fmin(data.minCoeff(), origin_.z()));
 
@@ -55,7 +55,7 @@ bool STOMPHelper::computeCosts(const Eigen::MatrixXd& parameters,
                   Eigen::VectorXd& costs,
                   bool& validity)
 {
-    return computeNoisyCosts(parameters, start_timestep, num_timesteps, iteration_number, -1, costs, validity);
+    return computeNoisyCosts(parameters, start_timestep, num_timesteps, iteration_number, 20, costs, validity);
 }
 
 bool STOMPHelper::computeNoisyCosts(const Eigen::MatrixXd& parameters,
@@ -68,10 +68,15 @@ bool STOMPHelper::computeNoisyCosts(const Eigen::MatrixXd& parameters,
 {
     costs.setZero(num_timesteps);
     validity = true;
-
     for (std::size_t t = 0u; t < num_timesteps; t++)
     {
         gtsam::Point3 pt(parameters(0, t), parameters(1, t), parameters(2, t));
+
+        if(pt.hasNaN()){
+            validity = false;
+            costs(t) = 100000;
+            continue;
+        }
         double err = 0, err_sdf = 0, err_sf = 0;
         if(pt.x() < origin_.x() || pt.y() < origin_.y() || pt.z() < origin_.z()){
             validity = false;
@@ -88,14 +93,14 @@ bool STOMPHelper::computeNoisyCosts(const Eigen::MatrixXd& parameters,
             double dist = sf_->getDistance(pt);
 
             if(dist_sdf < vehicle_size_ + dist_sdf_){
-                err_sdf = vehicle_size_ + dist_sdf_ - dist;
+                err_sdf = (vehicle_size_ + dist_sdf_) - dist_sdf;
             }
             if(dist < vehicle_size_){
                 validity = false;
                 err = dist;
             }
             else if(dist > dist_sf_){
-                err_sf = dist;
+                err_sf = 1/(1 + exp(-dist));
             }
 
         }

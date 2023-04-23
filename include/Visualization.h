@@ -115,7 +115,7 @@ inline gtsam::Matrix loadSeaFloorData(std::string file_name){
     for (int i=0; i<x_width; i++){
         for (int j=0; j<y_width; j++){
             depth_file>>tmp;
-            data(i,j) = tmp ;
+            data(i,j) = tmp;
         }
     }
     return data;

@@ -1,4 +1,5 @@
 #include "Planning3DUUV.h"
+#include <gtsam/slam/dataset.h>
 
 Planning3DUUV::Planning3DUUV(Planning3DUUVParameter param):
         _use_vehicle_dynamics(param.use_vehicle_dynamics), _dynamics_sigma(param.dynamics_sigma),
@@ -177,23 +178,41 @@ std::vector<Pose3> Planning3DUUV::optimize(vector<Pose3> poses,
     DoglegOptimizer optimizer(graph, init_values);
     DoglegParams params;
     params.maxIterations = _max_iter;
+    auto start = std::chrono::high_resolution_clock::now();
+
     Values result = optimizer.optimize();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    std::cout << "Time taken: " << duration.count() << " milliseconds\n";
     vector <Pose3> p;
-    savePath(file_path, result, graph.error(result)/_total_time_step);
+    savePath(file_path, result, graph.error(result), duration.count());
     for (int i = 0; i <= _total_time_step; i++ ){
         Pose3 pose = result.at<Pose3>(Symbol('x', i));
         p.push_back(pose);
     }
+//    gtsam::writeG2o(graph, result, "result.g2o");
+    graph.resize(0);
+    init_values.clear();
     return p;
 }
 
-void Planning3DUUV::savePath(string filename, Values v, double error){
+void Planning3DUUV::savePath(string filename, Values v, double error, double time){
     std::fstream file;
     file.open(filename, std::ios::out);
-
+    double length = 0;
+    for (int i = 1; i <= _total_time_step; i++ ){
+        Pose3 pose1 = v.at<Pose3>(Symbol('x', i-1));
+        Pose3 pose2 = v.at<Pose3>(Symbol('x', i));
+        length += pose1.range(pose2);
+    }
     v.print("Final Result:\n");
-    file <<"total error: "<< error <<endl;
-    file <<"x, y, z, roll, pitch, yaw, dx, dy, dz, droll, dpitch, dyaw"<<endl;
+    file << "Computational Time:" << time << " milliseconds" << endl;
+    file << "Traj Length:" << length << endl;
+    file << "Total Timestamp:" << _total_time_step << endl;
+    file << "Total Cost: "<< error <<endl;
+    file << "x, y, z, roll, pitch, yaw, dx, dy, dz, droll, dpitch, dyaw"<<endl;
     for (int i = 0; i <= _total_time_step; i++ ){
         Pose3 pose = v.at<Pose3>(Symbol('x', i));
         Vector vel = v.at<Vector>(Symbol('v', i));
@@ -207,3 +226,12 @@ void Planning3DUUV::savePath(string filename, Values v, double error){
     }
     file.close();
 }
+
+void Planning3DUUV::updateSeafloorMissionStatus(bool seafloor_mission){
+    _seafloor_mission = seafloor_mission;
+}
+
+void Planning3DUUV::updateSealevelMissionStatus(bool sealevel_mission){
+    _sealevel_mission = sealevel_mission;
+}
+

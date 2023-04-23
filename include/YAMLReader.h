@@ -23,7 +23,7 @@ namespace YAML {
     };
 }
 
-inline Planning3DUUVParameter readParamYAML(YAML::Node planner){
+inline Planning3DUUVParameter readParamYAML(YAML::Node planner, bool mission = false){
     Planning3DUUVParameter param;
 
     param.vehicle_size = planner["vehicle_size"].as<double>();
@@ -41,14 +41,25 @@ inline Planning3DUUVParameter readParamYAML(YAML::Node planner){
     param.obstacle_cost_sigma = obstacle["cost_sigma"].as<double>();
 
     YAML::Node seafloor = planner["seafloor"];
-    param.seafloor_mission = seafloor["seafloor_mission"].as<bool>();
+    if (mission){
+        param.seafloor_mission = true;
+    }
+    else{
+        param.seafloor_mission = seafloor["seafloor_mission"].as<bool>();
+    }
+
     if(param.seafloor_mission){
         param.seafloor_cost_sigma = seafloor["cost_sigma"].as<double>();
         param.seafloor_dist = seafloor["epsilon_dist"].as<double>();
     }
 
     YAML::Node sealevel = planner["sealevel"];
-    param.sealevel_mission = sealevel["sealevel_mission"].as<bool>();
+    if(mission){
+        param.sealevel_mission = true;
+    }
+    else{
+        param.sealevel_mission = sealevel["sealevel_mission"].as<bool>();
+    }
     if(param.sealevel_mission){
         param.sealevel_cost_sigma = sealevel["cost_sigma"].as<double>();
         param.sealevel_dist = sealevel["epsilon_dist"].as<double>();

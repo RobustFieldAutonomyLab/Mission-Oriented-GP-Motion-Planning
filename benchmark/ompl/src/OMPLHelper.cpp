@@ -26,14 +26,15 @@ ob::OptimizationObjectivePtr multiObjective(const ob::SpaceInformationPtr& si,
 
 OMPLHelper::OMPLHelper(const std::string& file_name, OMPLParameter params):
     vehicle_size_(params.vehicle_size), origin_(params.origin),
-        cell_size_(params.cell_size), method_(params.method),
+        cell_size_(params.cell_size), method_(params.method),cell_size_z_(params.cell_size_z),
         max_time_(params.max_time), sea_level_(params.sea_level),
-        dist_sdf_(params.dist_sdf), dist_sf_(params.dist_sf){
+        dist_sdf_(params.dist_sdf), dist_sf_(params.dist_sf),
+        use_objective_(params.use_objective){
     bool ok = false;
     double s_max, s_min;
     try
     {
-        gtsam::Matrix data = loadSeaFloorData("../" + file_name);
+        gtsam::Matrix data = loadSeaFloorData(file_name);
         sf_ = new gpmp2::Seafloor(params.origin, params.cell_size, data);
         sdf_ = buildSDF(cell_size_, params.cell_size_z, origin_, data, params.sea_level);
         s_max = data.maxCoeff();
@@ -49,10 +50,10 @@ OMPLHelper::OMPLHelper(const std::string& file_name, OMPLParameter params):
 //        auto space(std::make_shared<ob::RealVectorStateSpace>());
         auto space(std::make_shared<ob::SE3StateSpace>());
 
-        double maxX = params.origin.x() + sf_->getColScale() * params.cell_size;
-        double maxY = params.origin.y() + sf_->getRowScale() * params.cell_size;
+        double maxX = params.origin.x() + sf_->getColScale();
+        double maxY = params.origin.y() + sf_->getRowScale();
         double maxZ = params.origin.z() +
-                int(fmin(s_max, params.sea_level)
+                int(fmax(s_max, params.sea_level)
                 - fmin(s_min, params.origin.z())) ;
 
         corner_ = gtsam::Point3(maxX, maxY, maxZ);
@@ -76,6 +77,7 @@ OMPLHelper::OMPLHelper(const std::string& file_name, OMPLParameter params):
 //        ss_->getSpaceInformation()->setStateValidityCheckingResolution(0.01);
 
         // set optimization objective
+        if (use_objective_)
         ss_->setOptimizationObjective(multiObjective(ss_->getSpaceInformation(), *sf_, dist_sf_,
                              *sdf_, dist_sdf_, params.cost_threshold, params.w_vd, params.w_sdf, params.w_sf));
 
@@ -113,7 +115,14 @@ bool OMPLHelper::plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt){
 
         og::PathGeometric &p = ss_->getSolutionPath();
 //        ss_->getPathSimplifier()->simplifyMax(p);
-        ss_->getPathSimplifier()->smoothBSpline(p);
+//        ss_->getPathSimplifier()->smoothBSpline(p);
+//        ss_->getPathSimplifier()->shortcutPath(p);
+        int goal_id = p.getStateCount() - 1;
+        auto goal_state = p.getState(goal_id)->as<ob::SE3StateSpace::StateType>();
+        double x_goal = goal_state->getX();
+        double y_goal = goal_state->getY();
+        if(abs(x_goal - end_pt.translation().x()) > 1 || abs(y_goal - end_pt.translation().y()) > 1)
+            return false;
 
         return true;
     }
@@ -121,32 +130,42 @@ bool OMPLHelper::plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt){
     return false;
 }
 
-void OMPLHelper::recordSolution(PLOT_TYPE tp, std::string file_name)
+void OMPLHelper::recordSolution(bool visualize, PLOT_TYPE tp, std::string file_name, double count)
 {
     if (!ss_ || !ss_->haveSolutionPath())
         return;
+    if (visualize){
+        plotEvidenceMap3D(sf_->getData(),origin_.x(),origin_.y(),cell_size_,tp);
 
-    plotEvidenceMap3D(sf_->getData(),origin_.x(),origin_.y(),cell_size_,tp);
-
-    matplot::hold(matplot::on);
+        matplot::hold(matplot::on);
+    }
 
     og::PathGeometric &p = ss_->getSolutionPath();
-    p.interpolate();
+//    p.interpolate(300);
+
+
+    auto cost = p.cost(ss_->getOptimizationObjective());
     std::vector<double> opt_x, opt_y, opt_z;
     std::ofstream file;
     file.open (file_name);
-    file << "error: "<<std::endl;
+    file << "Computational Time: "<<count<<std::endl;
+    file << "Traj Length: "<<p.length()<<std::endl;
+    file << "Total Timestamp: "<<p.getStateCount()<<std::endl;
+    file << "Total Cost: "<<cost.value()<<std::endl;
     file << "x, y, z"<<std::endl;
     for (std::size_t i = 0; i < p.getStateCount(); ++i)
     {
         opt_x.push_back(p.getState(i)->as<ob::SE3StateSpace::StateType>()->getX());
         opt_y.push_back(p.getState(i)->as<ob::SE3StateSpace::StateType>()->getY());
         opt_z.push_back(p.getState(i)->as<ob::SE3StateSpace::StateType>()->getZ());
-        file << opt_x[i] << ", "<< opt_y[i] << ", " <<opt_z[i] << " " <<std::endl;
+        file << opt_x[i] << ", "<< opt_y[i] << ", " <<opt_z[i] <<std::endl;
     }
     file.close();
-    auto l = matplot::plot3(opt_x, opt_y, opt_z,"-ob");
-    matplot::show();
+    if(visualize){
+        auto l = matplot::plot3(opt_x, opt_y, opt_z,"-ob");
+        matplot::show();
+    }
+
 }
 
 bool OMPLHelper::isStateValid(const ompl::base::State *state) const
@@ -156,7 +175,7 @@ bool OMPLHelper::isStateValid(const ompl::base::State *state) const
     double z = state->as<ob::SE3StateSpace::StateType>()->getZ();
     if(x < origin_.x() || y < origin_.y() || z < origin_.z())
         return false;
-    if(x+cell_size_ > corner_.x() || y+cell_size_ > corner_.y() || z+cell_size_ > corner_.z() || z > sea_level_)
+    if(x+cell_size_ > corner_.x() || y+cell_size_ > corner_.y() || z+cell_size_z_ > corner_.z() || z > sea_level_)
         return false;
 //    else
 //        return true;
@@ -166,4 +185,3 @@ bool OMPLHelper::isStateValid(const ompl::base::State *state) const
     else
         return false;
 }
-

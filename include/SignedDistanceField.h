@@ -162,7 +162,7 @@ inline gpmp2::SignedDistanceField* buildSDF(double cell_size, double cell_size_z
                             data(i, j) = 1;
                         }
                     }
-//                cout<< z * cell_size_z + origin.z() <<endl;
+//                cout<< z * cell_size_z + origin.z( ) <<endl;
                 }
             }
         }

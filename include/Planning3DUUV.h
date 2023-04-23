@@ -77,7 +77,10 @@ public:
     void buildCurrentGrid(double cell_size, double cell_size_z, Point3 origin,
                           vector<Matrix> grid_u, vector<Matrix> grid_v);
 
-    void savePath(string file, Values v, double error);
+    void savePath(string file, Values v, double error, double time);
+
+    void updateSeafloorMissionStatus(bool seafloor_mission);
+    void updateSealevelMissionStatus(bool sealevel_mission);
 
 private:
     typedef Planning<Pose3MobileBaseModel, SignedDistanceField> Base;

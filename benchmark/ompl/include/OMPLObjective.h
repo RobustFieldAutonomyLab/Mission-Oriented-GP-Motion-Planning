@@ -33,8 +33,7 @@ public:
         auto pose1 = SE3StateSpace2Pose3(s1);
         auto pose2 =SE3StateSpace2Pose3(s2);
         auto pose_btwn = pose1.transform_pose_to(pose2);
-        double err = pose_btwn.y()*pose_btwn.y() +
-                     pose_btwn.rotation().pitch() * pose_btwn.rotation().pitch() * 100;
+        double err = pose_btwn.y()*pose_btwn.y();
 
         return ompl::base::Cost(err);
     }
