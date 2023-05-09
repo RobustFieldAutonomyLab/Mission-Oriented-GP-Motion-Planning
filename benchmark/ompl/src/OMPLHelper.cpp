@@ -2,6 +2,8 @@
 #include <ompl/base/ConstrainedSpaceInformation.h>
 #include <ompl/base/spaces/constraint/ProjectedStateSpace.h>
 #include <ompl/geometric/planners/AnytimePathShortening.h>
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+#include <utility>
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -14,11 +16,13 @@ ob::OptimizationObjectivePtr multiObjective(const ob::SpaceInformationPtr& si,
     ob::OptimizationObjectivePtr vehicleDynamicsObj(new vehicleDynamicsObjective(si));
     ob::OptimizationObjectivePtr seafloorFollowingObj(new seafloorFollowingObjective(si,sf, dist_sf));
     ob::OptimizationObjectivePtr signedDistanceFieldObj(new signedDistanceFieldObjective(si, sdf, dist_sdf));
+    auto pathLengthObj = std::make_shared<ob::PathLengthOptimizationObjective>(si);
 
     ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);
     opt->addObjective(vehicleDynamicsObj, w_vd);
     opt->addObjective(seafloorFollowingObj, w_sf);
     opt->addObjective(signedDistanceFieldObj, w_sdf);
+    opt->addObjective(pathLengthObj, 1.0);
     opt->setCostThreshold(ob::Cost(cost_thres));
 
     return ob::OptimizationObjectivePtr(opt);
@@ -78,11 +82,13 @@ OMPLHelper::OMPLHelper(const std::string& file_name, OMPLParameter params):
 
         // set optimization objective
         if (use_objective_)
-        ss_->setOptimizationObjective(multiObjective(ss_->getSpaceInformation(), *sf_, dist_sf_,
-                             *sdf_, dist_sdf_, params.cost_threshold, params.w_vd, params.w_sdf, params.w_sf));
+            ss_->setOptimizationObjective(multiObjective(ss_->getSpaceInformation(), *sf_, dist_sf_ + vehicle_size_,
+                             *sdf_, dist_sdf_ + vehicle_size_, params.cost_threshold, params.w_vd, params.w_sdf, params.w_sf));
 
-        if(method_ == "RRTStar")
+        if(method_ == "RRTStar") {
             ss_->setPlanner(std::make_shared<og::RRTstar>(ss_->getSpaceInformation()));
+        }
+
     }
 }
 
@@ -104,7 +110,6 @@ bool OMPLHelper::plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt){
     auto rot_g = end_pt.rotation().quaternion();
     goal->rotation().setAxisAngle(rot_g(0), rot_g(1),rot_g(2), rot_g(3));
     ss_->setStartAndGoalStates(start, goal);
-    // generate a few solutions; all will be added to the goal;
     ss_->solve(max_time_);
 
     const std::size_t ns = ss_->getProblemDefinition()->getSolutionCount();
@@ -112,10 +117,9 @@ bool OMPLHelper::plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt){
     if (ss_->haveSolutionPath())
     {
 //        ss_->simplifySolution();
-
         og::PathGeometric &p = ss_->getSolutionPath();
 //        ss_->getPathSimplifier()->simplifyMax(p);
-//        ss_->getPathSimplifier()->smoothBSpline(p);
+        ss_->getPathSimplifier()->smoothBSpline(p);
 //        ss_->getPathSimplifier()->shortcutPath(p);
         int goal_id = p.getStateCount() - 1;
         auto goal_state = p.getState(goal_id)->as<ob::SE3StateSpace::StateType>();
@@ -175,7 +179,7 @@ bool OMPLHelper::isStateValid(const ompl::base::State *state) const
     double z = state->as<ob::SE3StateSpace::StateType>()->getZ();
     if(x < origin_.x() || y < origin_.y() || z < origin_.z())
         return false;
-    if(x+cell_size_ > corner_.x() || y+cell_size_ > corner_.y() || z+cell_size_z_ > corner_.z() || z > sea_level_)
+    if(x+cell_size_ > corner_.x() || y+cell_size_ > corner_.y() || z+cell_size_z_ > corner_.z() || z+cell_size_z_ > sea_level_)
         return false;
 //    else
 //        return true;

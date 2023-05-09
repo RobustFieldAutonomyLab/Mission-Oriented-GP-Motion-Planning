@@ -70,6 +70,10 @@ bool STOMPHelper::computeNoisyCosts(const Eigen::MatrixXd& parameters,
     validity = true;
     for (std::size_t t = 0u; t < num_timesteps; t++)
     {
+        if (t == 0 || t == num_timesteps - 1){
+            costs(t) = 0;
+            continue;
+        }
         gtsam::Point3 pt(parameters(0, t), parameters(1, t), parameters(2, t));
 
         if(pt.hasNaN()){
@@ -99,8 +103,9 @@ bool STOMPHelper::computeNoisyCosts(const Eigen::MatrixXd& parameters,
                 validity = false;
                 err = dist;
             }
-            else if(dist > dist_sf_){
-                err_sf = 1/(1 + exp(-dist));
+            else if(dist > dist_sf_ + vehicle_size_){
+//                err_sf = 1/(1 + exp(-dist));
+                err_sf = -dist;
             }
 
         }

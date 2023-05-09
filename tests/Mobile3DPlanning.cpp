@@ -118,7 +118,8 @@ void run(string yaml_path){
         plotEvidenceMap3D(seafloor_map,ori(0),
                           ori(1),map["cell_size"].as<double>(),tp);
         matplot::hold(matplot::on);
-        auto l = matplot::plot3(X, Y, Z,"-ob");
+        auto l = matplot::plot3(X, Y, Z,"-or");
+        l->line_width(2);
         matplot::show();
     }
 }

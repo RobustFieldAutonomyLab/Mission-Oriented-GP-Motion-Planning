@@ -1,9 +1,9 @@
 trajectory:
-  delta_t: 0.4
+  delta_t: .5
   total_time_step: 100
   start_position: [5, 5, -4220]
   start_rotation: [0, 0, 0]
-  start_velocity: [2, 0, 0]
+  start_velocity: [0, 0, 0]
   start_angular_velocity: [0, 0, 0]
 
   end_position: [45, 45, -4182]
@@ -11,25 +11,33 @@ trajectory:
   end_velocity: [0, 0, 0]
   end_angular_velocity: [0, 0, 0]
 
+  average_velocity: [ 1, 0, 0 ]
+  average_angular_velocity: [ 0, 0, 0 ]
+
 planner:
   vehicle_size: 1
-  check_inter: 10
-  max_iter: 1000
-  Qc: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
+  check_inter: 1
+  max_iter: 10000
+  Qc: [0.01, 0.01, 0.01, .01, .01, 0.01]
 
   dynamics:
     use_vehicle_dynamics: true
-    sigma: 0.2
+    sigma: 1
   obstacle:
     epsilon_dist: 1
-    cost_sigma: 0.2
+    cost_sigma: 0.01
   seafloor:
     seafloor_mission: false
-    epsilon_dist: 1.2
+    epsilon_dist: 5
     cost_sigma: 0.2
-
+  sealevel:
+    sealevel_mission: false
+    #Interest distance from sealevel
+    epsilon_dist: 3
+    #Weight for sealevel mission
+    cost_sigma: 5
   current:
-    use_current: true
+    use_current: false
     cell_size: 1
     cell_size_z: 1000
     origin: [0, 0, -5000]
@@ -43,26 +51,32 @@ map:
 
 path:
   load_sdf: false
-  seafloor_path: "../../data/str/depth_grid2.csv"
+  seafloor_path: "/home/rfal/darpa/GPMP_STR/data/str/depth_grid2.csv"
   sdf_path:
   out_path: "../../data/result.txt"
   current_u_path: "../../data/str/u_mean.csv"
   current_v_path: "../../data/str/v_mean.csv"
 
 visualization:
-  visualize: true
+  visualize: false
   downsize_mesh: false
 
 ompl:
   method: "RRTStar"
-  max_planning_time: 10
-  cost_threshold: 1000
+  max_planning_time: 60
+  cost_threshold: 50
+  repeat_times: 30
+  out_dir: "result_no_mission_no_object"
+  use_objective: false
 
 stomp:
-  num_iterations: 1000
+  num_iterations: 10000
   control_cost_weight: 0.0
   num_iterations_after_valid: 0
-  num_rollouts: 200
-  max_rollouts: 200
-  initialization_method: 2
+  num_rollouts: 20
+  max_rollouts: 20
+  repeat_times: 30
+  initialization_method: 1
+  std_dev: [2,2,2]
+  out_dir: "result_mission_100"
   # 1: LINEAR_INTERPOLATION, 2: CUBIC_POLYNOMIAL_INTERPOLATION, 3: MININUM_CONTROL_COST

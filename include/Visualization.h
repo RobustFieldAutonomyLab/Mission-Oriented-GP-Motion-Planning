@@ -13,7 +13,6 @@
 
 enum PLOT_TYPE{MESH, POINT, DOWNSIZE_MESH, OFF};
 
-
 inline gtsam::Point2 get_center(double x, double y, double origin_x, double origin_y, double cell_size ){
     gtsam::Point2 center = gtsam::Point2(int( (y-origin_y)/cell_size ),
                            int( (x-origin_x)/cell_size ) );
@@ -67,7 +66,8 @@ inline void plotEvidenceMap3D(gtsam::Matrix prob_grid,
             }
             Z.push_back(this_line_Z);
         }
-        mesh(X, Y, Z);
+        auto m = mesh(X, Y, Z);
+        m->display_name("map");
     }
     else if (type == DOWNSIZE_MESH){
         int grid_size = std::max(grid_cols, grid_rows);
@@ -82,7 +82,8 @@ inline void plotEvidenceMap3D(gtsam::Matrix prob_grid,
             }
             Z.push_back(this_line_Z);
         }
-        mesh(X, Y, Z);
+        auto m = mesh(X, Y, Z);
+        m->display_name("map");
     }
     else if (type == POINT){
         std::vector<double> X, Y, Z, sizes;

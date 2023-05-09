@@ -107,10 +107,9 @@ public:
   /// convert between point and cell corrdinate
   inline float_index convertPoint3toCell(const gtsam::Point3& point) const {
     // check point range
-    if (point.x() < origin_.x() || point.x() > (origin_.x() + (field_cols_-1.0)*cell_size_) ||
-        point.y() < origin_.y() || point.y() > (origin_.y() + (field_rows_-1.0)*cell_size_) ||
-        point.z() < origin_.z() || point.z() > (origin_.z() + (field_z_-1.0)*cell_size_z_)) {
-        
+    if (point.x() < origin_.x() || point.x() >= (origin_.x() + (field_cols_-1.0)*cell_size_) ||
+        point.y() < origin_.y() || point.y() >= (origin_.y() + (field_rows_-1.0)*cell_size_) ||
+        point.z() < origin_.z() || point.z() >= (origin_.z() + (field_z_-1.0)*cell_size_z_)) {
       throw SDFQueryOutOfRange();
     }
 

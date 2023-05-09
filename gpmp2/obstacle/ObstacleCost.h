@@ -35,7 +35,7 @@ inline double hingeLossObstacleCost(const gtsam::Point3& point, const SignedDist
 //    std::cout << "[hingeLossObstacleCost] WARNING: querying signed distance out of range, "
 //        "assume zero obstacle cost." << std::endl;
     if (H_point) *H_point = gtsam::Matrix13::Zero();
-    return 0.0;
+    return 10000000.0;
   }
 
   if (dist_signed > eps) {
