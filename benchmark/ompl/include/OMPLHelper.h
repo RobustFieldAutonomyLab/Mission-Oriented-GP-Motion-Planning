@@ -46,6 +46,8 @@ struct OMPLParameter{
 
     double cost_threshold;
     double max_time;
+
+    bool use_objective;
 };
 
 class OMPLHelper
@@ -55,7 +57,7 @@ public:
 
     bool plan(gtsam::Pose3 start_pt, gtsam::Pose3 end_pt);
 
-    void recordSolution(PLOT_TYPE tp, std::string file_name);
+    void recordSolution(bool visualize, PLOT_TYPE tp, std::string file_name, double count);
 
 private:
     bool isStateValid(const ompl::base::State *state) const;
@@ -68,6 +70,7 @@ private:
     gtsam::Point3 origin_, corner_;
 
     double cell_size_;
+    double cell_size_z_;
     double vehicle_size_;
 
     gpmp2::Seafloor* sf_;
@@ -76,5 +79,7 @@ private:
     gpmp2::SignedDistanceField* sdf_;
     double dist_sdf_;
     double sea_level_;
+
+    bool use_objective_;
 
 };

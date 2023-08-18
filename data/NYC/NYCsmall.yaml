@@ -1,15 +1,18 @@
 trajectory:
-  delta_t: 0.5
+  delta_t: 0.6
   total_time_step: 200
-  start_position: [40, 10, -15]
+  start_position: [50, 100, -8]
   start_rotation: [0, 0, 0]
-  start_velocity: [2, 0, 0]
+  start_velocity: [0, 0, 0]
   start_angular_velocity: [0, 0, 0]
 
-  end_position: [50, 100, -10]
+  end_position: [40, 10, -8]
   end_rotation: [0, 0, 0]
   end_velocity: [0, 0, 0]
   end_angular_velocity: [0, 0, 0]
+
+  average_velocity: [2, 0, 0]
+  average_angular_velocity: [0, 0, 0]
 
 planner:
   vehicle_size: 1
@@ -26,12 +29,19 @@ planner:
     #When using big cell size, use bigger epsilon_dist
     epsilon_dist: 1
     #Weight for obstacle avoidance
-    cost_sigma: 1
+    cost_sigma: 2
+  #not sure whether we could have seafloor and sealevel mission at the same time
   seafloor:
     seafloor_mission: true
     #Interest distance from seafloor
     epsilon_dist: 1.2
     #Weight for seafloor mission
+    cost_sigma: 1
+  sealevel:
+    sealevel_mission: false
+    #Interest distance from sealevel
+    epsilon_dist: 1.2
+    #Weight for sealevel mission
     cost_sigma: 1
 
   current:
@@ -42,7 +52,7 @@ planner:
 
 map:
   origin: [0, 0, -35]
-  sea_level: -6
+  sea_level: -4
   cell_size: 1
   cell_size_z: 1
   use_boundary: true

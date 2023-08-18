@@ -64,8 +64,12 @@ inline std::vector<Matrix> signedDistanceField3D(const std::vector<Matrix> &grou
     one_map.setOnes(rows, cols);
 
     bool all_zero = true;
-    bool cur_map[z*rows*cols];
-    bool inv_map[z*rows*cols];
+    // Create a vector<bool> and initialize it with the values in arr
+//    bool cur_map[z*rows*cols];
+//    bool inv_map[z*rows*cols];
+
+    bool* cur_map = new bool[z*rows*cols];
+    bool* inv_map = new bool[z*rows*cols];
     for (int k = 0; k < z; k++){
         if (ground_truth_map[k].sum() != 0)
             all_zero = false;
@@ -112,6 +116,9 @@ inline std::vector<Matrix> signedDistanceField3D(const std::vector<Matrix> &grou
         field_3D.push_back(this_layer);
     }
 
+    delete[] cur_map;
+    delete[] inv_map;
+
     return field_3D;
 }
 
@@ -123,7 +130,7 @@ inline gpmp2::SignedDistanceField* buildSDF(double cell_size, double cell_size_z
     int rows = seafloor_map.rows();
     int cols = seafloor_map.cols();
 
-    double max_z = sea_level;
+    double max_z = fmax(sea_level, s_max);
     double min_z = fmin(s_min, origin.z());
 
     int z_level = int( (max_z - min_z) / cell_size_z );
@@ -155,7 +162,7 @@ inline gpmp2::SignedDistanceField* buildSDF(double cell_size, double cell_size_z
                             data(i, j) = 1;
                         }
                     }
-//                cout<< z * cell_size_z + origin.z() <<endl;
+//                cout<< z * cell_size_z + origin.z( ) <<endl;
                 }
             }
         }
@@ -166,7 +173,7 @@ inline gpmp2::SignedDistanceField* buildSDF(double cell_size, double cell_size_z
         for(int j=1; j<cols-1; j++){
             std::vector<double> all_z;
             all_z.push_back(origin.z());
-            for (int z=0; z < z_level-1; z++){
+            for (int z=0; z * cell_size_z + origin.z() <= sea_level && z < data_3D.size(); z++){
                 if (data_3D[z](i,j) == 1){
                     all_z.push_back(origin.z() + cell_size_z * z);
                 }
