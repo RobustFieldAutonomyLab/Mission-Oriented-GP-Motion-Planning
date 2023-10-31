@@ -26,11 +26,11 @@ sudo apt-get install cmake
 sudo apt-get install libboost-all-dev
 ```
 
-- [GTSAM](https://github.com/borglab/gtsam.git) 4.0.0
+- [GTSAM](https://github.com/borglab/gtsam.git) 4.0.0 
 ```bash
 git clone https://github.com/borglab/gtsam.git
 cd gtsam
-git checkout wrap-export
+git checkout wrap-export # only work with specific version of GTSAM
 mkdir build && cd build
 cmake ..
 make check  # optional, run unit tests
