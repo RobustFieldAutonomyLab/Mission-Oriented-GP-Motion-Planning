@@ -81,7 +81,7 @@ mkdir build
 cd build
 cmake ..
 make
-testMobile3D your_choice_of_yaml_file.yaml (example:../data/STR.yaml)
+tests/testMobile3D your_choice_of_yaml_file.yaml (example:../data/STR.yaml)
 ```
 
 
