@@ -1,6 +1,8 @@
-# UUVPlanning
+# MGPMP
+Mission-oriented Gaussian Process Motion Planning(MGPMP) is a novel motion planning framework for unmanned underwater vehicles (UUVs) - the first framework
+that applies Gaussian process motion planning to solve a 3D path planning problem for a 6-DoF robot in underwaterenvironments. We address missions requiring UUVs to remain
+in close proximity to seafloor terrain, which must be achieved alongside collision avoidance. Our framework also considers the influence of current flows as part of the cost function, allowing for more accurate planning.
 
-GP Motion Planning for 3D UUV
 # Install
 - [CMake](http://www.cmake.org/cmake/resources/software.html) >= 3.0 
 ```bash
@@ -57,36 +59,6 @@ inline void _squared_edt_1d_parabolic(
 ```bash
 cd UUVPlanning/third_party
 git clone https://github.com/alandefreitas/matplotplusplus.git
-```
-
-# For Benchmark Testing
-- [OMPL](https://ompl.kavrakilab.org/index.html)
-- [STOMP](https://github.com/ros-industrial/stomp.git)
-```bash
-git clone https://github.com/ros-industrial/stomp.git
-cp -r stomp/include/stomp UUVPlanning/benchmark/stomp/include
-cp stomp/src/stomp.cpp UUVPlanning/benchmark/stomp/src
-cp stomp/src/utils.cpp UUVPlanning/benchmark/stomp/src
-In file stomp/src/stomp.cpp
-change line 185 to:
-Eigen::MatrixXd& parameters_optimized, double&cost)
-change line 193 to:
-  return solve(parameters_optimized_, parameters_optimized, cost);
-change line 196 to:
-bool Stomp::solve(const Eigen::VectorXd& first, const Eigen::VectorXd& last, Eigen::MatrixXd& parameters_optimized, double&cost)
-change line 205 to:
-  return solve(start, end, parameters_optimized, cost);
-change line 208 to:
-bool Stomp::solve(const Eigen::MatrixXd& initial_parameters, Eigen::MatrixXd& parameters_optimized, double&cost)
-change line 283 to:
-  cost = current_lowest_cost_;
-In file stomp/include/stomp/stomp.h
-change line 53 to:
-  bool solve(const std::vector<double>& first, const std::vector<double>& last, Eigen::MatrixXd& parameters_optimized, double& cost);
-change line 62 to:
-  bool solve(const Eigen::VectorXd& first, const Eigen::VectorXd& last, Eigen::MatrixXd& parameters_optimized, double & cost);
-change line 70 to:
-  bool solve(const Eigen::MatrixXd& initial_parameters, Eigen::MatrixXd& parameters_optimized, double & cost);
 ```
 
 # GPMP 
