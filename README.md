@@ -2,7 +2,7 @@
 **Mission-oriented Gaussian Process Motion Planning(MGPMP) is a novel motion planning framework for unmanned under-water vehicles (UUVs) - the first framework
 that applies Gaussian process motion planning to solve a 3D path planning problem for a 6-DoF robot in underwaterenvironments. We address missions requiring UUVs to remain
 in close proximity to seafloor terrain, which must be achieved alongside collision avoidance. Our framework also considers the influence of current flows as part of the cost function, allowing for more accurate planning.**
-<p align="center"><img src="factor.jpg" width=900></p>
+<p align="center"><img src="factor.jpg" width=700></p>
 
 ## 
  - Here we provide a 3D motion planning example and two example datasets, NYC upper bay dataset and Queen Elizabeth Island dataset.
