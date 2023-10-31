@@ -1,9 +1,22 @@
 # MGPMP
-Mission-oriented Gaussian Process Motion Planning(MGPMP) is a novel motion planning framework for unmanned underwater vehicles (UUVs) - the first framework
+**Mission-oriented Gaussian Process Motion Planning(MGPMP) is a novel motion planning framework for unmanned under-water vehicles (UUVs) - the first framework
 that applies Gaussian process motion planning to solve a 3D path planning problem for a 6-DoF robot in underwaterenvironments. We address missions requiring UUVs to remain
-in close proximity to seafloor terrain, which must be achieved alongside collision avoidance. Our framework also considers the influence of current flows as part of the cost function, allowing for more accurate planning.
+in close proximity to seafloor terrain, which must be achieved alongside collision avoidance. Our framework also considers the influence of current flows as part of the cost function, allowing for more accurate planning.**
+<p align="center"><img src="factor.jpg" width=900></p>
 
-# Install
+## 
+ - Here we provide a 3D motion planning example and two example datasets, NYC upper bay dataset and Queen Elizabeth Island dataset.
+ - **The GP Motion Planning code in GPMP2 doc is developed based on [GPMP2](https://github.com/borglab/gpmp2.git).**
+```
+  ├──MGPMP
+     ├── ...
+     ├── gpmp2                      # GP Motion Planning code
+     ├── tests
+     │   └── Mobile3DPlanning.cpp   # 3D motion planning example
+     ├── data                       # Folder for NYC upper bay(NYC) and Queen Elizabeth Island upper bay(str) dataset
+     └── ...
+  ```
+# Denpencies
 - [CMake](http://www.cmake.org/cmake/resources/software.html) >= 3.0 
 ```bash
 sudo apt-get install cmake
@@ -60,6 +73,15 @@ inline void _squared_edt_1d_parabolic(
 cd UUVPlanning/third_party
 git clone https://github.com/alandefreitas/matplotplusplus.git
 ```
+## How to use
 
-# GPMP 
-The GP Motion Planning code in GPMP2 doc is developed based on [GPMP2](https://github.com/borglab/gpmp2.git).
+```
+cd Misson-Oriented-GP-Motion-Planning
+mkdir build
+cd build
+cmake ..
+make
+testMobile3D your_choice_of_yaml_file.yaml (example:../data/STR.yaml)
+```
+
+
