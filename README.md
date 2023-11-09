@@ -6,7 +6,7 @@ in close proximity to seafloor terrain, which must be achieved alongside collisi
 
 ## 
  - Here we provide a 3D motion planning example and two example datasets, NYC upper bay dataset and Queen Elizabeth Island dataset.
- - **The GP Motion Planning code in GPMP2 doc is developed based on [GPMP2](https://github.com/borglab/gpmp2.git).**
+ - **The GP Motion Planning code in GPMP2 folder is developed based on [GPMP2](https://github.com/borglab/gpmp2.git).**
 ```
   ├──MGPMP
      ├── ...
